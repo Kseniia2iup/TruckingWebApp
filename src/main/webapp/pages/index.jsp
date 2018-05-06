@@ -26,7 +26,6 @@
 <body>
 
 <div class="container">
-
     <div class="jumbotron" style="margin-top: 20px;">
         <sec:authorize access="!isAuthenticated()">
             <p><a class="btn btn-lg btn-success" href="<c:url value="/pages/login.jsp" />" role="button">Войти</a></p>
