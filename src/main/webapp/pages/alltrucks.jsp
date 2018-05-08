@@ -5,6 +5,8 @@
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
     <title>All trucks</title>
 
+    <link href="<c:url value="/pages/css/bootstrap.css" />" rel="stylesheet" />
+    <link href="<c:url value="/pages/css/app.css" />" rel="stylesheet" />
     <style>
         tr:first-child{
             font-weight: bold;
@@ -16,6 +18,9 @@
 
 
 <body>
+<div class="page-header"></div>
+<div class="container">
+    <div class="success">
 <h2>List of Trucks</h2>
 <table>
     <tr>
@@ -33,8 +38,8 @@
     </c:forEach>
 </table>
 <br/>
-${success}
-<br/>
 <a href="<c:url value='//newTruck' />">Add New Truck</a>
+</div>
+</div>
 </body>
 </html>

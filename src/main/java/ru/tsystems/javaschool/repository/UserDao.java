@@ -1,8 +1,8 @@
-package ru.tsystems.javaschool.service;
+package ru.tsystems.javaschool.repository;
 
 import ru.tsystems.javaschool.model.User;
 
-public interface UserService {
+public interface UserDao {
 
     void save(User user);
 

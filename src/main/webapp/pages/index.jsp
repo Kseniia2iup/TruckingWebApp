@@ -14,35 +14,25 @@
     <title>Spring Security</title>
 
     <!-- Bootstrap core CSS -->
-    <link href="css/bootstrap.css" rel="stylesheet">
-
-    <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
-    <!--[if lt IE 9]>
-    <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
-    <script src="https://oss.maxcdn.com/libs/respond.js/1.3.0/respond.min.js"></script>
-    <![endif]-->
+    <link href="<c:url value="/pages/css/bootstrap.css" />" rel="stylesheet" />
+    <link href="<c:url value="/pages/css/app.css" />" rel="stylesheet" />
 </head>
 
 <body>
-
+<div class="page-header"></div>
 <div class="container">
-    <div class="jumbotron" style="margin-top: 20px;">
-        <sec:authorize access="!isAuthenticated()">
-            <p><a class="btn btn-lg btn-success" href="<c:url value="/pages/login.jsp" />" role="button">Войти</a></p>
-        </sec:authorize>
-        <sec:authorize access="isAuthenticated()">
-            <p>Ваш логин: <sec:authentication property="principal.username" /></p>
-            <p><a class="btn btn-lg btn-danger" href="<c:url value="/logout" />" role="button">Выйти</a></p>
-
-        </sec:authorize>
-    </div>
-
-    <div class="footer">
+    <div class="success">
+        ${greeting}
+        <br />
         <a href="pages/drivers.jsp">Drivers</a>
         <br />
         <a href="<c:url value="/listTrucks"/>">All Trucks</a>
-    </div>
+        <br />
+            <a href="<c:url value="/login"/>">Log in</a>
+        <br />
 
+    </div>
+</div>
 </div>
 </body>
 </html>

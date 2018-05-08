@@ -2,13 +2,14 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@ taglib uri="http://www.springframework.org/security/tags" prefix="sec" %>
 <%@ taglib prefix="form" uri="http://www.springframework.org/tags/form" %>
-<html>
 
 <html>
 
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
     <title>Truck Registration Form</title>
+    <link href="<c:url value="/pages/css/bootstrap.css" />" rel="stylesheet" />
+    <link href="<c:url value="/pages/css/app.css" />" rel="stylesheet" />
 
     <style>
 
@@ -20,7 +21,9 @@
 </head>
 
 <body>
-
+<div class="page-header"></div>
+<div class="container">
+    <div class="success">
 <h2>Add Truck Form</h2>
 
 <form:form method="POST" modelAttribute="truck" >
@@ -67,5 +70,7 @@
 <br/>
 <br/>
 Go back to <a href="<c:url value='/listTrucks' />">List of All Employees</a>
+</div>
+</div>
 </body>
 </html>

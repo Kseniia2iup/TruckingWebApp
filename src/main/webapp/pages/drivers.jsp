@@ -14,15 +14,21 @@
     <title>Spring Security</title>
 
     <!-- Bootstrap core CSS -->
-    <link href="<c:url value="/pages/css/bootstrap.css" />" rel="stylesheet">
+    <link href="<c:url value="/pages/css/bootstrap.css" />" rel="stylesheet" />
+    <link href="<c:url value="/pages/css/app.css" />" rel="stylesheet" />
 
     <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
     <!--[if lt IE 9]>
-    <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
-    <script src="https://oss.maxcdn.com/libs/respond.js/1.3.0/respond.min.js"></script>
+    <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js" />
+    <script src="https://oss.maxcdn.com/libs/respond.js/1.3.0/respond.min.js" />
     <![endif]-->
 </head>
 <body>
+<div class="page-header"></div>
+<div class="container">
+    <div class="success">
     <h1>Drivers</h1>
+    </div>
+</div>
 </body>
 </html>
