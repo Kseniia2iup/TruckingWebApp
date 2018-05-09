@@ -5,8 +5,8 @@
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
     <title>All trucks</title>
 
-    <link href="<c:url value="/pages/css/bootstrap.css" />" rel="stylesheet" />
-    <link href="<c:url value="/pages/css/app.css" />" rel="stylesheet" />
+    <link href="<c:url value="/static/css/bootstrap.css" />" rel="stylesheet" />
+    <link href="<c:url value="/static/css/app.css" />" rel="stylesheet" />
     <style>
         tr:first-child{
             font-weight: bold;
@@ -38,7 +38,7 @@
     </c:forEach>
 </table>
 <br/>
-<a href="<c:url value='//newTruck' />">Add New Truck</a>
+<a href="<c:url value='/newTruck' />">Add New Truck</a>
 </div>
 </div>
 </body>

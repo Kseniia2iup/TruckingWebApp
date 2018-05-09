@@ -5,14 +5,14 @@ public enum UserProfileType {
     DBA("DRIVER"),
     ADMIN("ADMIN");
 
-    String userProfileType;
+    String type;
 
-    UserProfileType(String userProfileType){
-        this.userProfileType = userProfileType;
+    UserProfileType(String type){
+        this.type = type;
     }
 
     public String getUserProfileType(){
-        return userProfileType;
+        return type;
     }
 
 }

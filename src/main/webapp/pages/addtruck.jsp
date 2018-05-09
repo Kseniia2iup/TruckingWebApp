@@ -8,8 +8,8 @@
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
     <title>Truck Registration Form</title>
-    <link href="<c:url value="/pages/css/bootstrap.css" />" rel="stylesheet" />
-    <link href="<c:url value="/pages/css/app.css" />" rel="stylesheet" />
+    <link href="<c:url value="/static/css/bootstrap.css" />" rel="stylesheet" />
+    <link href="<c:url value="/static/css/app.css" />" rel="stylesheet" />
 
     <style>
 
@@ -69,7 +69,7 @@
 </form:form>
 <br/>
 <br/>
-Go back to <a href="<c:url value='/listTrucks' />">List of All Employees</a>
+Go back to <a href="<c:url value='/listTrucks' />">List of All Trucks</a>
 </div>
 </div>
 </body>

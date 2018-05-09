@@ -4,10 +4,11 @@ import java.io.Serializable;
 
 import java.lang.reflect.ParameterizedType;
 
-import org.hibernate.Criteria;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
 public abstract class AbstractDao <PK extends Serializable, T> {
 
@@ -26,20 +27,18 @@ public abstract class AbstractDao <PK extends Serializable, T> {
     }
 
     @SuppressWarnings("unchecked")
+    @Transactional(readOnly = true, propagation = Propagation.SUPPORTS)
     public T getByKey(PK key) {
         return (T) getSession().get(persistentClass, key);
     }
 
+    @Transactional(propagation = Propagation.REQUIRED)
     public void persist(T entity) {
         getSession().persist(entity);
     }
 
     public void delete(T entity) {
         getSession().delete(entity);
-    }
-
-    protected Criteria createEntityCriteria(){
-        return getSession().createCriteria(persistentClass);
     }
 
 }

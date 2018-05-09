@@ -13,8 +13,8 @@
     <title>Spring Security</title>
 
     <!-- Bootstrap core CSS -->
-    <link href="<c:url value="/pages/css/bootstrap.css" />" rel="stylesheet" />
-    <link href="<c:url value="/pages/css/app.css" />" rel="stylesheet" />
+    <link href="<c:url value="/static/css/bootstrap.css" />" rel="stylesheet" />
+    <link href="<c:url value="/static/css/app.css" />" rel="stylesheet" />
 
 </head>
 

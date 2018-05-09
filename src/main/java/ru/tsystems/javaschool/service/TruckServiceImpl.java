@@ -12,8 +12,12 @@ import java.util.List;
 @Transactional
 public class TruckServiceImpl implements TruckService {
 
-    @Autowired
     private TruckDao truckDao;
+
+    @Autowired
+    public void setTruckDao(TruckDao truckDao) {
+        this.truckDao = truckDao;
+    }
 
     @Override
     public Truck findTruckById(int id) {

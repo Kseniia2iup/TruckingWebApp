@@ -12,9 +12,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.ui.ModelMap;
 import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.*;
 import ru.tsystems.javaschool.model.User;
 import ru.tsystems.javaschool.model.UserProfile;
 import ru.tsystems.javaschool.service.UserProfileService;
@@ -31,47 +29,56 @@ public class MainController {
 
     private static final Logger LOG = LoggerFactory.getLogger(MainController.class);
 
+    private MessageSource messageSource;
+
+    private UserProfileService userProfileService;
+
+    private UserService userService;
+
     @Autowired
-    MessageSource messageSource;
-
-
+    public void setMessageSource(MessageSource messageSource) {
+        this.messageSource = messageSource;
+    }
     @Autowired
-    UserProfileService userProfileService;
-
+    public void setUserProfileService(UserProfileService userProfileService) {
+        this.userProfileService = userProfileService;
+    }
     @Autowired
-    UserService userService;
+    public void setUserService(UserService userService) {
+        this.userService = userService;
+    }
 
-    @RequestMapping(value = {"/", "/home", "/welcome", "/index"}, method = RequestMethod.GET)
+    @GetMapping(path = {"/", "/home", "/welcome", "/index"})
     public String indexPage(Model model)
     {
         model.addAttribute("greeting", "Oh, It's finally works!");
         return "index";
     }
 
-    @RequestMapping(value = "/admin", method = RequestMethod.GET)
+    @GetMapping(path = "/admin")
     public String adminPage(ModelMap model) {
         model.addAttribute("user", getPrincipal());
         return "admin";
     }
 
-    @RequestMapping(value = "/db", method = RequestMethod.GET)
+    @GetMapping(path = "/db")
     public String dbaPage(ModelMap model) {
         model.addAttribute("user", getPrincipal());
         return "dba";
     }
 
-    @RequestMapping(value = "/Access_Denied", method = RequestMethod.GET)
+    @GetMapping(value = "/Access_Denied")
     public String accessDeniedPage(ModelMap model) {
         model.addAttribute("user", getPrincipal());
         return "accessDenied";
     }
 
-    @RequestMapping(value = "/login", method = RequestMethod.GET)
+    @GetMapping(path = "/login")
     public String loginPage() {
         return "login";
     }
 
-    @RequestMapping(value="/logout", method = RequestMethod.GET)
+    @GetMapping(value="/logout")
     public String logoutPage (HttpServletRequest request, HttpServletResponse response) {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         if (auth != null){
@@ -81,7 +88,7 @@ public class MainController {
     }
 
 
-    @RequestMapping(value = "/newUser", method = RequestMethod.GET)
+    @GetMapping(path = "/newUser")
     public String newRegistration(ModelMap model) {
         User user = new User();
         model.addAttribute("user", user);
@@ -92,7 +99,7 @@ public class MainController {
      * This method will be called on form submission, handling POST request It
      * also validates the user input
      */
-    @RequestMapping(value = "/newUser", method = RequestMethod.POST)
+    @PostMapping(path = "/newUser")
     public String saveRegistration(@Valid User user,
                                    BindingResult result, ModelMap model) {
 
@@ -103,12 +110,12 @@ public class MainController {
         userService.save(user);
 
         LOG.info("From MainController saveRegistration method:" +
-                "\nLogin : "+user.getLogin() +
-                "\nPassword : "+user.getPassword() +
-                "\nChecking UsrProfiles....");
+                "\nLogin : {}"+
+                "\nPassword : {}"+
+                "\nChecking UsrProfiles....",user.getLogin(),user.getPassword());
         if(user.getUserProfiles()!=null){
             for(UserProfile profile : user.getUserProfiles()){
-                LOG.info("Profile : "+ profile.getType());
+                LOG.info("Profile : {}", profile.getType());
             }
         }
 

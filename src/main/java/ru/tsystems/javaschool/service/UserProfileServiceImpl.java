@@ -12,8 +12,12 @@ import java.util.List;
 @Transactional
 public class UserProfileServiceImpl implements UserProfileService{
 
+    private UserProfileDao dao;
+
     @Autowired
-    UserProfileDao dao;
+    public void setDao(UserProfileDao dao) {
+        this.dao = dao;
+    }
 
     public List<UserProfile> findAll() {
         return dao.findAll();

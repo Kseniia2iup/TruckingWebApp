@@ -3,7 +3,6 @@ package ru.tsystems.javaschool.model;
 import ru.tsystems.javaschool.model.enums.TruckStatus;
 
 import javax.persistence.*;
-import java.util.Set;
 
 @Entity
 @Table(name = "trucks")
@@ -27,7 +26,7 @@ public class Truck {
     @Enumerated(EnumType.STRING)
     private TruckStatus condition;
 
-    @ManyToOne(fetch = FetchType.EAGER)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "city_id")
     private City city;
 

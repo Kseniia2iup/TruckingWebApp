@@ -1,9 +1,9 @@
 package ru.tsystems.javaschool.repository;
 
-import org.hibernate.Criteria;
 import org.hibernate.Query;
-import org.hibernate.criterion.Restrictions;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 import ru.tsystems.javaschool.model.Truck;
 
 import java.util.List;
@@ -16,10 +16,11 @@ public class TruckDaoImpl extends AbstractDao<Integer, Truck> implements TruckDa
     }
 
     @Override
-    public Truck findTruckByRegNumber(String reg_number) {
-        Criteria criteria = createEntityCriteria();
-        criteria.add(Restrictions.eq("reg_number", reg_number));
-        return (Truck) criteria.uniqueResult();
+    @Transactional(readOnly = true, propagation = Propagation.SUPPORTS)
+    public Truck findTruckByRegNumber(String regNumber) {
+        Query query = getSession().createQuery("SELECT T FROM Truck T WHERE T.reg_number = :reg_number");
+        query.setParameter("reg_number", regNumber);
+        return (Truck) query.uniqueResult();
     }
 
     @Override
@@ -28,16 +29,18 @@ public class TruckDaoImpl extends AbstractDao<Integer, Truck> implements TruckDa
     }
 
     @Override
-    public void deleteTruckByRegNumber(String reg_number) {
+    @Transactional(propagation = Propagation.REQUIRED)
+    public void deleteTruckByRegNumber(String regNumber) {
         Query query = getSession().createSQLQuery("delete from trucks where reg_number = :reg_number");
-        query.setString("reg_number", reg_number);
+        query.setString("reg_number", regNumber);
         query.executeUpdate();
     }
 
     @Override
     @SuppressWarnings("unchecked")
+    @Transactional(readOnly = true, propagation = Propagation.SUPPORTS)
     public List<Truck> findAllTrucks() {
-        Criteria criteria = createEntityCriteria();
-        return (List<Truck>) criteria.list();
+        Query query = getSession().createQuery("Select T from Truck T Join Fetch T.city");
+        return query.list();
     }
 }

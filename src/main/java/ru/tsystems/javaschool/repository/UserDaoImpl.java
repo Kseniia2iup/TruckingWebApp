@@ -1,8 +1,9 @@
 package ru.tsystems.javaschool.repository;
 
-import org.hibernate.Criteria;
-import org.hibernate.criterion.Restrictions;
+import org.hibernate.Query;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 import ru.tsystems.javaschool.model.User;
 
 @Repository("userDao")
@@ -16,10 +17,11 @@ public class UserDaoImpl extends AbstractDao<Integer, User> implements UserDao {
         return getByKey(id);
     }
 
+    @Transactional(readOnly = true, propagation = Propagation.SUPPORTS)
     public User findByLogin(String login) {
-        Criteria criteria = createEntityCriteria();
-        criteria.add(Restrictions.eq("login", login));
-        return (User) criteria.uniqueResult();
+        Query query = getSession().createQuery("SELECT U FROM User U WHERE U.login = :login");
+        query.setParameter("login", login);
+        return (User) query.uniqueResult();
     }
 
 }

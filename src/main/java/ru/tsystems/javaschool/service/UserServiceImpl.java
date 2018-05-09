@@ -11,12 +11,19 @@ import ru.tsystems.javaschool.repository.UserDao;
 @Transactional
 public class UserServiceImpl implements UserService{
 
-    @Autowired
     private UserDao dao;
 
-    @Autowired
     private PasswordEncoder passwordEncoder;
 
+    @Autowired
+    public void setDao(UserDao dao) {
+        this.dao = dao;
+    }
+
+    @Autowired
+    public void setPasswordEncoder(PasswordEncoder passwordEncoder) {
+        this.passwordEncoder = passwordEncoder;
+    }
 
     public void save(User user){
         user.setPassword(passwordEncoder.encode(user.getPassword()));

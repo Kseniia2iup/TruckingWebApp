@@ -1557,6 +1557,7 @@ city_name</ColNames>
     <column id="370" parent="289" name="city_id">
       <Position>6</Position>
       <DataType>int(11)|0s</DataType>
+      <NotNull>1</NotNull>
       <ColumnKind>normal</ColumnKind>
     </column>
     <index id="371" parent="289" name="id_UNIQUE">

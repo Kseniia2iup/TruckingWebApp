@@ -1,9 +1,9 @@
 package ru.tsystems.javaschool.repository;
 
-import org.hibernate.Criteria;
-import org.hibernate.criterion.Order;
-import org.hibernate.criterion.Restrictions;
+import org.hibernate.Query;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 import ru.tsystems.javaschool.model.UserProfile;
 
 import java.util.List;
@@ -12,19 +12,20 @@ import java.util.List;
 public class UserProfileDaoImpl extends AbstractDao<Integer, UserProfile>implements UserProfileDao{
 
     @SuppressWarnings("unchecked")
+    @Transactional(readOnly = true, propagation = Propagation.SUPPORTS)
     public List<UserProfile> findAll(){
-        Criteria crit = createEntityCriteria();
-        crit.addOrder(Order.asc("type"));
-        return (List<UserProfile>)crit.list();
+        Query query = getSession().createQuery("from UserProfile");
+        return query.list();
     }
 
     public UserProfile findById(int id) {
         return getByKey(id);
     }
 
+    @Transactional(readOnly = true, propagation = Propagation.SUPPORTS)
     public UserProfile findByType(String type) {
-        Criteria crit = createEntityCriteria();
-        crit.add(Restrictions.eq("type", type));
-        return (UserProfile) crit.uniqueResult();
+        Query query = getSession().createQuery("SELECT U FROM UserProfile U WHERE U.type = :type");
+        query.setParameter("type", type);
+        return (UserProfile) query.uniqueResult();
     }
 }

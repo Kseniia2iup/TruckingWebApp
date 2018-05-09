@@ -18,7 +18,7 @@
         <spring.mvc>4.1.5.RELEASE</spring.mvc>
         <jstl.version>1.2</jstl.version>
         <spring.securiry>4.2.5.RELEASE</spring.securiry>
-        <springframework.version>4.2.5.RELEASE</springframework.version>
+        <springframework.version>4.3.0.RELEASE</springframework.version>
         <hibernate.version>4.3.6.Final</hibernate.version>
     </properties>
 

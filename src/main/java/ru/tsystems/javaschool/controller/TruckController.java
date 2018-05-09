@@ -7,9 +7,7 @@ import org.springframework.ui.Model;
 import org.springframework.ui.ModelMap;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.*;
 import ru.tsystems.javaschool.model.Truck;
 import ru.tsystems.javaschool.service.TruckService;
 
@@ -20,46 +18,49 @@ import java.util.Locale;
 @Controller
 public class TruckController {
 
+    private static final String TRUCK_LIST_VIEW_PATH = "redirect:/listTrucks";
+    private static final String ADD_TRUCK_VIEW_PATH = "addtruck";
+
     @Autowired
     TruckService truckService;
 
     @Autowired
     MessageSource messageSource;
 
-    @RequestMapping(value = {"listTrucks"})
+    @GetMapping(path = {"listTrucks"})
     public String listOfTrucks(Model model) {
         List<Truck> trucks = truckService.findAllTrucks();
         model.addAttribute("trucks", trucks);
         return "alltrucks";
     }
 
-    @RequestMapping(value = { "/delete-{reg_number}-truck" }, method = RequestMethod.GET)
+    @GetMapping(path = { "/delete-{reg_number}-truck" })
     public String deleteTruck(@PathVariable String reg_number) {
         truckService.deleteTruckByRegNumber(reg_number);
-        return "redirect:/listTrucks";
+        return TRUCK_LIST_VIEW_PATH;
     }
 
     /*
      * This method will provide the medium to add a new employee.
      */
-    @RequestMapping(value = { "/newTruck" }, method = RequestMethod.GET)
+    @GetMapping(path = { "/newTruck" })
     public String newTruck(ModelMap model) {
         Truck truck = new Truck();
-        model.addAttribute("tuck", truck);
+        model.addAttribute("truck", truck);
         model.addAttribute("edit", false);
-        return "addtruck";
+        return ADD_TRUCK_VIEW_PATH;
     }
 
     /*
      * This method will be called on form submission, handling POST request for
      * saving employee in database. It also validates the user input
      */
-    @RequestMapping(value = { "/newTruck" }, method = RequestMethod.POST)
+    @PostMapping(path = { "/newTruck" })
     public String saveEmployee(@Valid Truck truck, BindingResult result,
                                ModelMap model) {
 
         if (result.hasErrors()) {
-            return "addtruck";
+            return ADD_TRUCK_VIEW_PATH;
         }
 
         /*
@@ -73,47 +74,47 @@ public class TruckController {
         if(!truckService.isTruckRegNumberUnique(truck.getId(), truck.getRegNumber())){
             FieldError regNumError = new FieldError("truck","reg_number",messageSource.getMessage("non.unique.reg_number", new String[]{truck.getRegNumber()}, Locale.getDefault()));
             result.addError(regNumError);
-            return "addtruck";
+            return ADD_TRUCK_VIEW_PATH;
         }
 
         truckService.saveTruck(truck);
 
         model.addAttribute("success", "Truck " + truck.getRegNumber() + " added successfully");
-        return "redirect:/listTrucks";
+        return TRUCK_LIST_VIEW_PATH;
     }
 
     /*
      * This method will provide the medium to update an existing employee.
      */
-    @RequestMapping(value = { "/edit-{reg_number}-truck" }, method = RequestMethod.GET)
-    public String editEmployee(@PathVariable String reg_number, ModelMap model) {
-        Truck truck = truckService.findTruckByRegNumber(reg_number);
+    @GetMapping(path = { "/edit-{regNumber}-truck" })
+    public String editEmployee(@PathVariable String regNumber, ModelMap model) {
+        Truck truck = truckService.findTruckByRegNumber(regNumber);
         model.addAttribute("truck", truck);
         model.addAttribute("edit", true);
-        return "addtruck";
+        return ADD_TRUCK_VIEW_PATH;
     }
 
     /*
      * This method will be called on form submission, handling POST request for
      * updating employee in database. It also validates the user input
      */
-    @RequestMapping(value = { "/edit-{reg_number}-truck" }, method = RequestMethod.POST)
+    @PostMapping(path = { "/edit-{regNumber}-truck" })
     public String updateEmployee(@Valid Truck truck, BindingResult result,
-                                 ModelMap model, @PathVariable String reg_number) {
+                                 ModelMap model, @PathVariable String regNumber) {
 
         if (result.hasErrors()) {
-            return "addtruck";
+            return ADD_TRUCK_VIEW_PATH;
         }
 
         if(!truckService.isTruckRegNumberUnique(truck.getId(), truck.getRegNumber())){
             FieldError regNumError = new FieldError("truck","reg_number",messageSource.getMessage("non.unique.reg_number", new String[]{truck.getRegNumber()}, Locale.getDefault()));
             result.addError(regNumError);
-            return "addtruck";
+            return ADD_TRUCK_VIEW_PATH;
         }
 
         truckService.updateTruck(truck);
 
         model.addAttribute("success", "Truck " + truck.getRegNumber()  + " updated successfully");
-        return "redirect:/listTrucks";
+        return TRUCK_LIST_VIEW_PATH;
     }
 }
