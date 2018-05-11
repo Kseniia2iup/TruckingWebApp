@@ -22,6 +22,8 @@ public class WebAppConfig extends WebMvcConfigurerAdapter {
     @Autowired
     RoleToUserProfileConverter roleToUserProfileConverter;
 
+    @Autowired
+    CityIdToCityConverter cityIdToCityConverter;
 
     @Bean
     public ViewResolver viewResolver() {
@@ -51,10 +53,11 @@ public class WebAppConfig extends WebMvcConfigurerAdapter {
 
     /*
      * Configure Converter to be used.
-     * In our example, we need a converter to convert string values[Roles] to UserProfiles in newUser.jsp
      */
     @Override
-    public void addFormatters(FormatterRegistry registry) {
+    public void addFormatters(FormatterRegistry registry)
+    {
         registry.addConverter(roleToUserProfileConverter);
+        registry.addConverter(cityIdToCityConverter);
     }
 }

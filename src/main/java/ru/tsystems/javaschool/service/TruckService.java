@@ -19,4 +19,6 @@ public interface TruckService {
     void updateTruck(Truck truck);
 
     boolean isTruckRegNumberUnique(Integer id, String reg_number);
+
+    boolean isTruckRegNumberIsValid(Integer id, String reg_number);
 }

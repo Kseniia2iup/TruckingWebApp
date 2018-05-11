@@ -109,10 +109,7 @@ public class MainController {
         }
         userService.save(user);
 
-        LOG.info("From MainController saveRegistration method:" +
-                "\nLogin : {}"+
-                "\nPassword : {}"+
-                "\nChecking UsrProfiles....",user.getLogin(),user.getPassword());
+        LOG.info("From MainController saveRegistration method:\nLogin : {}\nChecking UsrProfiles....",user.getLogin());
         if(user.getUserProfiles()!=null){
             for(UserProfile profile : user.getUserProfiles()){
                 LOG.info("Profile : {}", profile.getType());

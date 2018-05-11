@@ -12,6 +12,8 @@ public interface TruckDao {
 
     void saveTruck(Truck truck);
 
+    void updateTruck(Truck truck);
+
     void deleteTruckByRegNumber(String regNumber);
 
     List<Truck> findAllTrucks();

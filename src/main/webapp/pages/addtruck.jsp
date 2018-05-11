@@ -10,14 +10,6 @@
     <title>Truck Registration Form</title>
     <link href="<c:url value="/static/css/bootstrap.css" />" rel="stylesheet" />
     <link href="<c:url value="/static/css/app.css" />" rel="stylesheet" />
-
-    <style>
-
-        .error {
-            color: #ff0000;
-        }
-    </style>
-
 </head>
 
 <body>
@@ -27,45 +19,68 @@
 <h2>Add Truck Form</h2>
 
 <form:form method="POST" modelAttribute="truck" >
-    <form:input type="hidden" path="id" id="id"/>
-    <table>
-        <tr>
-            <td><label for="reg_number">Reg Number: </label> </td>
-            <td><form:input path="regNumber" id="reg_number"/></td>
-            <td><form:errors path="regNumber" cssClass="error"/></td>
-        </tr>
+    <div class="row">
+        <div class="form-group col-md-12">
+            <label class="col-md-3 control-lable" for="reg_number">Registration number</label>
+            <div class="col-md-7">
+                <form:input type="text" path="regNumber" id="reg_number" placeholder="AA00000" class="form-control input-sm"/>
+            </div>
+        </div>
+    </div>
 
-        <tr>
-            <td><label for="shift_period">Shift Period: </label> </td>
-            <td><form:input path="shiftPeriod" id="shift_period"/></td>
-            <td><form:errors path="shiftPeriod" cssClass="error"/></td>
-        </tr>
+    <div class="row">
+        <div class="form-group col-md-12">
+            <label class="col-md-3 control-lable" for="shift_period">Shift Period</label>
+            <div class="col-md-7">
+                <form:input type="text" path="shiftPeriod" id="shift_period" class="form-control input-sm"/>
+            </div>
+        </div>
+    </div>
 
-        <tr>
-            <td><label for="capacity_ton">Capacity(ton): </label> </td>
-            <td><form:input path="capacityTon" id="capacity_ton"/></td>
-            <td><form:errors path="capacityTon" cssClass="error"/></td>
-        </tr>
+    <div class="row">
+        <div class="form-group col-md-12">
+            <label class="col-md-3 control-lable" for="capacity">Capacity</label>
+            <div class="col-md-7">
+                <form:input type="text" path="capacityTon" id="capacity" class="form-control input-sm"/>
+            </div>
+        </div>
+    </div>
 
-        <tr>
-            <td><label for="condition">Condition: </label> </td>
-            <td><form:input path="condition" id="condition"/></td>
-            <td><form:errors path="condition" cssClass="error"/></td>
-        </tr>
 
-        <tr>
-            <td colspan="3">
-                <c:choose>
-                    <c:when test="${edit}">
-                        <input type="submit" value="Update"/>
-                    </c:when>
-                    <c:otherwise>
-                        <input type="submit" value="Register"/>
-                    </c:otherwise>
-                </c:choose>
-            </td>
-        </tr>
-    </table>
+    <div class="row">
+        <div class="form-group col-md-12">
+            <label class="col-md-3 control-lable" for="city">City</label>
+            <div class="col-md-7">
+                <form:select id ="city" path="city" items="${cities}" class="form-control input-sm"
+                             itemLabel="name" itemValue="id"/>
+            </div>
+        </div>
+    </div>
+
+
+    <div class="row">
+        <div class="form-group col-md-12">
+            <label class="col-md-3 control-lable" for="condition">Condition</label>
+            <div class="col-md-7">
+                <form:select id ="status" path="condition" items="${truckConditions}" class="form-control input-sm"/>
+            </div>
+        </div>
+    </div>
+
+
+    <div class="row">
+        <div class="form-actions floatRight">
+            <c:choose>
+                <c:when test="${edit}">
+                    <input type="submit" class="btn btn-primary btn-sm" value="Update"/>
+                </c:when>
+                <c:otherwise>
+                    <input type="submit" class="btn btn-primary btn-sm" value="Register"/>
+                </c:otherwise>
+            </c:choose>
+        </div>
+    </div>
+
 </form:form>
 <br/>
 <br/>

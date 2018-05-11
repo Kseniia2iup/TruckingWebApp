@@ -32,9 +32,14 @@ public abstract class AbstractDao <PK extends Serializable, T> {
         return (T) getSession().get(persistentClass, key);
     }
 
-    @Transactional(propagation = Propagation.REQUIRED)
+    @Transactional(propagation = Propagation.MANDATORY)
     public void persist(T entity) {
         getSession().persist(entity);
+    }
+
+    @Transactional(propagation = Propagation.MANDATORY)
+    public void update(T entity) {
+        getSession().update(entity);
     }
 
     public void delete(T entity) {

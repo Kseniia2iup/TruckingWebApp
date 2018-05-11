@@ -28,8 +28,7 @@ public class RoleToUserProfileConverter implements Converter<Object, UserProfile
     public UserProfile convert(Object element) {
         Integer id = Integer.parseInt((String)element);
         UserProfile profile= userProfileService.findById(id);
-        LOG.info("From RoleToUserProfileConverter convert method" +
-                "\nProfile : {}", profile);
+        LOG.info("From RoleToUserProfileConverter convert method\nProfile : {}", profile);
         return profile;
     }
 

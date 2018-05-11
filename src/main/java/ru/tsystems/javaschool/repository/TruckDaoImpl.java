@@ -10,6 +10,7 @@ import java.util.List;
 
 @Repository("truckDao")
 public class TruckDaoImpl extends AbstractDao<Integer, Truck> implements TruckDao {
+
     @Override
     public Truck findTruckById(int id) {
         return getByKey(id);
@@ -29,10 +30,15 @@ public class TruckDaoImpl extends AbstractDao<Integer, Truck> implements TruckDa
     }
 
     @Override
-    @Transactional(propagation = Propagation.REQUIRED)
+    public void updateTruck(Truck truck) {
+        update(truck);
+    }
+
+    @Override
+    @Transactional(propagation = Propagation.MANDATORY)
     public void deleteTruckByRegNumber(String regNumber) {
-        Query query = getSession().createSQLQuery("delete from trucks where reg_number = :reg_number");
-        query.setString("reg_number", regNumber);
+        Query query = getSession().createQuery("Delete Truck T WHERE T.reg_number = :reg_number");
+        query.setParameter("reg_number", regNumber);
         query.executeUpdate();
     }
 

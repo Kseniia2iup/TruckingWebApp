@@ -24,15 +24,16 @@
 <h2>List of Trucks</h2>
 <table>
     <tr>
-        <td>TRUCK CONDITION</td><td>SHIFT PERIOD</td><td>CAPACITY (TON)</td><td>CITY</td><td>REG NUMBER</td><td></td>
+        <td>REG NUMBER</td><td>CONDITION</td><td>SHIFT PERIOD</td><td>CAPACITY (TON)</td><td>CITY</td><td></td><td></td>
     </tr>
     <c:forEach items="${trucks}" var="truck">
         <tr>
+            <td>${truck.regNumber}</td>
             <td>${truck.condition}</td>
             <td>${truck.shiftPeriod}</td>
             <td>${truck.capacityTon}</td>
             <td>${truck.city.name}</td>
-            <td><a href="<c:url value='/edit-${truck.regNumber}-truck' />">${truck.regNumber}</a></td>
+            <td><a href="<c:url value='/edit-${truck.id}-truck' />">edit</a></td>
             <td><a href="<c:url value='/delete-${truck.regNumber}-truck' />">delete</a></td>
         </tr>
     </c:forEach>

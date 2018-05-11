@@ -81,5 +81,4 @@ public class Truck {
     public void setCondition(TruckStatus condition) {
         this.condition = condition;
     }
-
 }
