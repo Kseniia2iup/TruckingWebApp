@@ -1,7 +1,7 @@
 package ru.tsystems.javaschool.model.enums;
 
 public enum DriverStatus {
-    DRIVING, SECOND_DRIVER, REST, LOADING;
+    Driving, Second_driver, Rest, Loading;
 
     DriverStatus() {
     }

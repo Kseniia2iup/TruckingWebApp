@@ -15,4 +15,11 @@ public interface DriverService {
     void updateDriver(Driver driver);
 
     List<Driver> findAllDrivers();
+
+    Integer getLastDriverId();
+
+    String generateDriverLogin(Driver driver);
+
+    String generateDriverPassword();
+
 }

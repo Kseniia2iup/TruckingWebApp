@@ -20,7 +20,7 @@ public class User {
     private String password;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "role")
+    @Column(name = "user_role")
     private Role role;
 
     @OneToOne(mappedBy="user")

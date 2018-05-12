@@ -34,8 +34,15 @@ public class DriverDaoImpl extends AbstractDao<Integer, Driver> implements Drive
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public List<Driver> findAllDrivers() {
         Query query = getSession().createQuery("Select D from Driver D Join Fetch D.city");
         return query.list();
+    }
+
+    @Override
+    public Integer getLastDriverId() {
+        Query query = getSession().createQuery("Select max(D.id) from Driver D");
+        return (Integer)query.uniqueResult();
     }
 }

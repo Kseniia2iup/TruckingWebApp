@@ -44,7 +44,7 @@ public class MainController {
     @GetMapping(path = {"/", "/home", "/welcome", "/index"})
     public String indexPage(Model model)
     {
-        model.addAttribute("greeting", "Oh, It's finally works!");
+        model.addAttribute("greeting", "Oh, It finally works!");
         return "index";
     }
 

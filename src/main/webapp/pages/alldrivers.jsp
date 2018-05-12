@@ -38,6 +38,7 @@
                     <td>${driver.surname}</td>
                     <td>${driver.workedThisMonth}</td>
                     <td>${driver.status}</td>
+                    <td>${driver.city.name}</td>
                     <td></td>
                     <td><a href="<c:url value='/edit-${driver.id}-driver' />">edit</a></td>
                     <td><a href="<c:url value='/delete-${driver.id}-driver'/>">delete</a></td>
@@ -45,7 +46,7 @@
             </c:forEach>
         </table>
         <br/>
-        <a href="<c:url value='' />">Add New Driver</a>
+        <a href="<c:url value='/newDriver' />">Add New Driver</a>
     </div>
 </div>
 </body>

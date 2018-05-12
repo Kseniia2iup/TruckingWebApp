@@ -15,4 +15,6 @@ public interface DriverDao {
     void updateDriver(Driver driver);
 
     List<Driver> findAllDrivers();
+
+    Integer getLastDriverId();
 }

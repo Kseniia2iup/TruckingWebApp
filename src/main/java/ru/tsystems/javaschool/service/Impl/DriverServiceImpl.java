@@ -8,6 +8,7 @@ import ru.tsystems.javaschool.repository.DriverDao;
 import ru.tsystems.javaschool.service.DriverService;
 
 import java.util.List;
+import java.util.Random;
 
 @Service("driverService")
 @Transactional
@@ -43,5 +44,40 @@ public class DriverServiceImpl implements DriverService {
     @Override
     public List<Driver> findAllDrivers() {
         return driverDao.findAllDrivers();
+    }
+
+    @Override
+    public Integer getLastDriverId() {
+        return driverDao.getLastDriverId();
+    }
+
+    /**
+     * Generate driver login based on driver name, max id form drivers table and random number
+     * @param driver current driver
+     * @return random login
+     */
+    @Override
+    public String generateDriverLogin(Driver driver) {
+        Random random = new Random();
+        return driver.getName()
+                +'_'
+                +getLastDriverId()
+                +random.nextInt(1000);
+    }
+
+    /**
+     * Generate driver password that contains numbers, lower and upper case characters
+     * @return random password
+     */
+    @Override
+    public String generateDriverPassword() {
+        Random random = new Random();
+        StringBuilder result = new StringBuilder();
+        for (int i = 0; i < 5; i++) {
+            result.append(random.nextInt(10));
+            result.append((char) (random.nextInt(26) + 65));
+            result.append((char) (random.nextInt(26) + 96));
+        }
+        return result.toString();
     }
 }

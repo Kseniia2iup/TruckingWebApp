@@ -5,14 +5,17 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.ui.ModelMap;
 import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.*;
+import ru.tsystems.javaschool.model.City;
 import ru.tsystems.javaschool.model.Driver;
 import ru.tsystems.javaschool.model.User;
+import ru.tsystems.javaschool.model.enums.DriverStatus;
+import ru.tsystems.javaschool.model.enums.Role;
+import ru.tsystems.javaschool.service.CityService;
 import ru.tsystems.javaschool.service.DriverService;
 import ru.tsystems.javaschool.service.UserService;
+
+import java.util.List;
 
 @Controller
 public class DriverController {
@@ -34,12 +37,25 @@ public class DriverController {
         this.userService = userService;
     }
 
+    private CityService cityService;
+
+    @Autowired
+    public void setCityService(CityService cityService) {
+        this.cityService = cityService;
+    }
+
     @RequestMapping(path = "listDrivers")
     public String listOfDrivers(Model model){
         model.addAttribute("drivers", driverService.findAllDrivers());
         return "alldrivers";
     }
 
+
+    @GetMapping(path = { "/delete-{id}-driver" })
+    public String deleteTruck(@PathVariable Integer id) {
+        driverService.deleteDriver(id);
+        return DRIVER_LIST_VIEW_PATH;
+    }
 
     @GetMapping(path = { "/newDriver" })
     public String newDriver(ModelMap model) {
@@ -55,12 +71,26 @@ public class DriverController {
         if (result.hasErrors()) {
             return ADD_DRIVER_VIEW_PATH;
         }
-        User user = driver.getUser();
-
+        User user = new User();
+        user.setLogin(driverService.generateDriverLogin(driver));
+        user.setPassword(driverService.generateDriverPassword());
+        user.setRole(Role.DRIVER);
+        userService.save(user);
+        driver.setId(user.getId());
         driverService.saveDriver(driver);
 
         model.addAttribute("success", "Driver " + driver.getName()
                 + " " + driver.getSurname() + " added successfully");
         return DRIVER_LIST_VIEW_PATH;
+    }
+
+    @ModelAttribute("cities")
+    public List<City> cityList(){
+        return cityService.findAllCities();
+    }
+
+    @ModelAttribute("driverStatuses")
+    public DriverStatus[] driverStatuses(){
+        return DriverStatus.values();
     }
 }

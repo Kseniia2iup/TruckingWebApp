@@ -210,7 +210,7 @@ CREATE INDEX `Waypoint_order_idx` ON `trucking`.`waypoints` (`order_id` ASC);
 
 CREATE INDEX `Waypoint_cargo_idx` ON `trucking`.`waypoints` (`cargo_id` ASC);
 
-INSERT INTO app_user (login, password, role) VALUES
+INSERT INTO app_user (login, password, user_role) VALUES
   ('Admin01', '$2a$10$4eqIF5s/ewJwHK1p8lqlFOEm2QIA0S8g6./Lok.pQxqcxaBZYChRm', 'ADMIN');
 
 INSERT INTO cities (city_name, latitude, longitude) VALUES

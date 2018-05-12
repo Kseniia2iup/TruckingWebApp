@@ -26,15 +26,15 @@ public class Driver {
     private DriverStatus status;
 
 
-    @OneToOne(cascade = {CascadeType.REMOVE, CascadeType.MERGE})
-    @JoinColumn(name="user_id", nullable=false)
+    @OneToOne(cascade = {CascadeType.REMOVE, CascadeType.REMOVE})
+    @JoinColumn(name="id", nullable=false)
     private User user;
 
-    @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "current_city")
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "city_id")
     private City city;
 
-    @ManyToOne(fetch = FetchType.EAGER)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "truck_id")
     private Truck currentTruck;
 
