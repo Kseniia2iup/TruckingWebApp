@@ -3,6 +3,7 @@ package ru.tsystems.javaschool.model;
 import ru.tsystems.javaschool.model.enums.TruckStatus;
 
 import javax.persistence.*;
+import java.util.Set;
 
 @Entity
 @Table(name = "trucks")
@@ -29,6 +30,9 @@ public class Truck {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "city_id")
     private City city;
+
+    @OneToMany(mappedBy = "currentTruck")
+    private Set<Driver> drivers;
 
 
     public Truck() {
@@ -80,5 +84,13 @@ public class Truck {
 
     public void setCondition(TruckStatus condition) {
         this.condition = condition;
+    }
+
+    public Set<Driver> getDrivers() {
+        return drivers;
+    }
+
+    public void setDrivers(Set<Driver> drivers) {
+        this.drivers = drivers;
     }
 }

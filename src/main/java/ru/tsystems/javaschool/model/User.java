@@ -1,18 +1,8 @@
 package ru.tsystems.javaschool.model;
 
-import java.util.HashSet;
-import java.util.Set;
+import ru.tsystems.javaschool.model.enums.Role;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.FetchType;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.JoinTable;
-import javax.persistence.ManyToMany;
-import javax.persistence.Table;
+import javax.persistence.*;
 
 @Entity
 @Table(name="app_user")
@@ -29,11 +19,12 @@ public class User {
     @Column(name="password", nullable=false)
     private String password;
 
-    @ManyToMany(fetch = FetchType.LAZY)
-    @JoinTable(name = "APP_USER_USER_PROFILE",
-            joinColumns = { @JoinColumn(name = "USER_ID") },
-            inverseJoinColumns = { @JoinColumn(name = "USER_PROFILE_ID") })
-    private Set<UserProfile> userProfiles = new HashSet<>();
+    @Enumerated(EnumType.STRING)
+    @Column(name = "role")
+    private Role role;
+
+    @OneToOne(mappedBy="user")
+    private Driver driver;
 
     public User() {
     }
@@ -62,11 +53,19 @@ public class User {
         this.password = password;
     }
 
-    public Set<UserProfile> getUserProfiles() {
-        return userProfiles;
+    public Role getRole() {
+        return role;
     }
 
-    public void setUserProfiles(Set<UserProfile> userProfiles) {
-        this.userProfiles = userProfiles;
+    public void setRole(Role role) {
+        this.role = role;
+    }
+
+    public Driver getDriver() {
+        return driver;
+    }
+
+    public void setDriver(Driver driver) {
+        this.driver = driver;
     }
 }

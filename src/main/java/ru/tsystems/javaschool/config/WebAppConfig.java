@@ -20,9 +20,6 @@ import org.springframework.web.servlet.view.JstlView;
 public class WebAppConfig extends WebMvcConfigurerAdapter {
 
     @Autowired
-    RoleToUserProfileConverter roleToUserProfileConverter;
-
-    @Autowired
     CityIdToCityConverter cityIdToCityConverter;
 
     @Bean
@@ -57,7 +54,7 @@ public class WebAppConfig extends WebMvcConfigurerAdapter {
     @Override
     public void addFormatters(FormatterRegistry registry)
     {
-        registry.addConverter(roleToUserProfileConverter);
-        registry.addConverter(cityIdToCityConverter);
+        //registry.addConverter(roleToUserProfileConverter);
+        //registry.addConverter(cityIdToCityConverter);
     }
 }

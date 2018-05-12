@@ -14,14 +14,12 @@ import org.springframework.ui.ModelMap;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import ru.tsystems.javaschool.model.User;
-import ru.tsystems.javaschool.model.UserProfile;
-import ru.tsystems.javaschool.service.UserProfileService;
+import ru.tsystems.javaschool.model.enums.Role;
 import ru.tsystems.javaschool.service.UserService;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
-import java.util.List;
 
 @Controller
 @RequestMapping("/")
@@ -31,18 +29,13 @@ public class MainController {
 
     private MessageSource messageSource;
 
-    private UserProfileService userProfileService;
-
     private UserService userService;
 
     @Autowired
     public void setMessageSource(MessageSource messageSource) {
         this.messageSource = messageSource;
     }
-    @Autowired
-    public void setUserProfileService(UserProfileService userProfileService) {
-        this.userProfileService = userProfileService;
-    }
+
     @Autowired
     public void setUserService(UserService userService) {
         this.userService = userService;
@@ -61,10 +54,16 @@ public class MainController {
         return "admin";
     }
 
-    @GetMapping(path = "/db")
-    public String dbaPage(ModelMap model) {
+    @GetMapping(path = "/manager")
+    public String managerPage(ModelMap model) {
         model.addAttribute("user", getPrincipal());
-        return "dba";
+        return "manager";
+    }
+
+    @GetMapping(path = "/driver")
+    public String driverPage(ModelMap model) {
+        model.addAttribute("user", getPrincipal());
+        return "driver";
     }
 
     @GetMapping(value = "/Access_Denied")
@@ -95,10 +94,6 @@ public class MainController {
         return "newuser";
     }
 
-    /*
-     * This method will be called on form submission, handling POST request It
-     * also validates the user input
-     */
     @PostMapping(path = "/newUser")
     public String saveRegistration(@Valid User user,
                                    BindingResult result, ModelMap model) {
@@ -110,11 +105,6 @@ public class MainController {
         userService.save(user);
 
         LOG.info("From MainController saveRegistration method:\nLogin : {}\nChecking UsrProfiles....",user.getLogin());
-        if(user.getUserProfiles()!=null){
-            for(UserProfile profile : user.getUserProfiles()){
-                LOG.info("Profile : {}", profile.getType());
-            }
-        }
 
         model.addAttribute("success", "User " + user.getLogin() + " has been registered successfully");
         return "registrationsuccess";
@@ -133,9 +123,8 @@ public class MainController {
     }
 
     @ModelAttribute("roles")
-    public List<UserProfile> initializeProfiles() {
-        return userProfileService.findAll();
+    public Role[] initializeProfiles() {
+        return Role.values();
     }
-
 
 }

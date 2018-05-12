@@ -11,7 +11,7 @@
     <meta name="description" content="">
     <meta name="author" content="">
 
-    <title>Spring Security</title>
+    <title>List Of Drivers</title>
 
     <!-- Bootstrap core CSS -->
     <link href="<c:url value="/static/css/bootstrap.css" />" rel="stylesheet" />
@@ -27,8 +27,27 @@
 <div class="page-header"></div>
 <div class="container">
     <div class="success">
-    <h1>Drivers</h1>
+        <h2>List of Drivers</h2>
+        <table>
+            <tr>
+                <td>NAME</td><td>SURNAME</td><td>WORKED THIS MONTH</td><td>STATUS</td><td>CITY</td><td></td><td></td>
+            </tr>
+            <c:forEach items="${drivers}" var="driver">
+                <tr>
+                    <td>${driver.name}</td>
+                    <td>${driver.surname}</td>
+                    <td>${driver.workedThisMonth}</td>
+                    <td>${driver.status}</td>
+                    <td></td>
+                    <td><a href="<c:url value='/edit-${driver.id}-driver' />">edit</a></td>
+                    <td><a href="<c:url value='/delete-${driver.id}-driver'/>">delete</a></td>
+                </tr>
+            </c:forEach>
+        </table>
+        <br/>
+        <a href="<c:url value='' />">Add New Driver</a>
     </div>
 </div>
+</body>
 </body>
 </html>

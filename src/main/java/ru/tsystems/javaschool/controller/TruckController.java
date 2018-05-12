@@ -46,37 +46,21 @@ public class TruckController {
         return TRUCK_LIST_VIEW_PATH;
     }
 
-    /*
-     * This method will provide the medium to add a new truck.
-     */
     @GetMapping(path = { "/newTruck" })
     public String newTruck(ModelMap model) {
-        Truck truck = new Truck();
-        model.addAttribute("truck", truck);
+        model.addAttribute("truck", new Truck());
         model.addAttribute("edit", false);
         return ADD_TRUCK_VIEW_PATH;
     }
 
-    /*
-     * This method will be called on form submission, handling POST request for
-     * saving truck in database. It also validates the user input
-     */
     @PostMapping(path = { "/newTruck" })
-    public String saveTruck(@Valid Truck truck, BindingResult result,
+    public String saveTruck(@ModelAttribute Truck truck, BindingResult result,
                                ModelMap model) {
 
         if (result.hasErrors()) {
             return ADD_TRUCK_VIEW_PATH;
         }
 
-        /*
-         * Preferred way to achieve uniqueness of field [regNumber] should be implementing custom @Unique annotation
-         * and applying it on field [regNumber] of Model class [Truck].
-         *
-         * Below mentioned peace of code [if block] is to demonstrate that you can fill custom errors outside the validation
-         * framework as well while still using internationalized messages.
-         *
-         */
         if(!truckService.isTruckRegNumberUnique(truck.getId(), truck.getRegNumber())){
             FieldError regNumError = new FieldError("truck","reg_number",messageSource.getMessage("non.unique.reg_number", new String[]{truck.getRegNumber()}, Locale.getDefault()));
             result.addError(regNumError);
@@ -95,21 +79,13 @@ public class TruckController {
         return TRUCK_LIST_VIEW_PATH;
     }
 
-    /*
-     * This method will provide the medium to update an existing truck.
-     */
     @GetMapping(path = { "/edit-{id}-truck" })
     public String editTruck(@PathVariable Integer id, ModelMap model) {
-        Truck truck = truckService.findTruckById(id);
-        model.addAttribute("truck", truck);
+        model.addAttribute("truck", truckService.findTruckById(id));
         model.addAttribute("edit", true);
         return ADD_TRUCK_VIEW_PATH;
     }
 
-    /*
-     * This method will be called on form submission, handling POST request for
-     * updating truck in database. It also validates the user input
-     */
     @PostMapping(path = { "/edit-{id}-truck" })
     public String updateTruck(@Valid Truck truck, BindingResult result,
                                  ModelMap model, @PathVariable Integer id) {

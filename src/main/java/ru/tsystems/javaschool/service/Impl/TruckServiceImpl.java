@@ -1,10 +1,11 @@
-package ru.tsystems.javaschool.service;
+package ru.tsystems.javaschool.service.Impl;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.tsystems.javaschool.model.Truck;
 import ru.tsystems.javaschool.repository.TruckDao;
+import ru.tsystems.javaschool.service.TruckService;
 
 import java.util.List;
 import java.util.regex.Matcher;

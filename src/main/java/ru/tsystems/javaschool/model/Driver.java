@@ -4,8 +4,8 @@ import ru.tsystems.javaschool.model.enums.DriverStatus;
 
 import javax.persistence.*;
 
-//@Entity
-//@Table(name = "drivers")
+@Entity
+@Table(name = "drivers")
 public class Driver {
 
     @Id
@@ -25,11 +25,17 @@ public class Driver {
     @Enumerated(EnumType.STRING)
     private DriverStatus status;
 
-    @Column(name = "current_city", nullable = false)
-    private String city;
+
+    @OneToOne(cascade = {CascadeType.REMOVE, CascadeType.MERGE})
+    @JoinColumn(name="user_id", nullable=false)
+    private User user;
 
     @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "reg_number")
+    @JoinColumn(name = "current_city")
+    private City city;
+
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "truck_id")
     private Truck currentTruck;
 
     public Driver() {
@@ -75,12 +81,27 @@ public class Driver {
         this.status = status;
     }
 
-    public String getCity() {
+    public City getCity() {
         return city;
     }
 
-    public void setCity(String city) {
+    public void setCity(City city) {
         this.city = city;
     }
 
+    public Truck getCurrentTruck() {
+        return currentTruck;
+    }
+
+    public void setCurrentTruck(Truck currentTruck) {
+        this.currentTruck = currentTruck;
+    }
+
+    public User getUser() {
+        return user;
+    }
+
+    public void setUser(User user) {
+        this.user = user;
+    }
 }

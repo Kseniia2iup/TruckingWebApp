@@ -1,10 +1,11 @@
-package ru.tsystems.javaschool.service;
+package ru.tsystems.javaschool.service.Impl;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.tsystems.javaschool.model.City;
 import ru.tsystems.javaschool.repository.CityDao;
+import ru.tsystems.javaschool.service.CityService;
 
 import java.util.List;
 

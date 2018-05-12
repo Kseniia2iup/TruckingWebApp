@@ -1,10 +1,12 @@
-package ru.tsystems.javaschool.repository;
+package ru.tsystems.javaschool.repository.Impl;
 
 import org.hibernate.Query;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import ru.tsystems.javaschool.model.Truck;
+import ru.tsystems.javaschool.repository.AbstractDao;
+import ru.tsystems.javaschool.repository.TruckDao;
 
 import java.util.List;
 

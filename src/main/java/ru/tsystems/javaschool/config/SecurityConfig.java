@@ -21,9 +21,11 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Autowired
+    AuthSuccessRedirectHandler authSuccessRedirectHandler;
+
+    @Autowired
     @Qualifier("userDetailsServiceImpl")
     private UserDetailsService userDetailsService;
-
 
     @Autowired
     public void configureGlobalSecurity(AuthenticationManagerBuilder auth) throws Exception {
@@ -31,12 +33,10 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         auth.authenticationProvider(authenticationProvider());
     }
 
-
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
-
 
     @Bean
     public DaoAuthenticationProvider authenticationProvider() {
@@ -52,8 +52,9 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers("/", "/index", "/home", "/welcome").permitAll()
                 .antMatchers("/admin/**","/newuser").access("hasRole('ADMIN')")
                 .antMatchers("/listTrucks").access("hasRole('ADMIN') or hasRole('USER')")
-                .antMatchers("/db/**").access("hasRole('ADMIN') or hasRole('DRIVER')")
-                .and().formLogin().loginPage("/login")
+                .antMatchers("/manager/**").access("hasRole('USER')")
+                .antMatchers("/driver/**").access("hasRole('DRIVER')")
+                .and().formLogin().loginPage("/login").successHandler(authSuccessRedirectHandler)
                 .usernameParameter("login").passwordParameter("password")
                 .and().csrf()
                 .and().exceptionHandling().accessDeniedPage("/Access_Denied");

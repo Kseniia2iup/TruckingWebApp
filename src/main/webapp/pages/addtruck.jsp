@@ -51,7 +51,7 @@
         <div class="form-group col-md-12">
             <label class="col-md-3 control-lable" for="city">City</label>
             <div class="col-md-7">
-                <form:select id ="city" path="city" items="${cities}" class="form-control input-sm"
+                <form:select id ="city" path="city.id" items="${cities}" class="form-control input-sm"
                              itemLabel="name" itemValue="id"/>
             </div>
         </div>

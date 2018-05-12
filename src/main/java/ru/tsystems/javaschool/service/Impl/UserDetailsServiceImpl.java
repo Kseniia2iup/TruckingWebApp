@@ -1,4 +1,4 @@
-package ru.tsystems.javaschool.service;
+package ru.tsystems.javaschool.service.Impl;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -14,7 +14,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.tsystems.javaschool.model.User;
-import ru.tsystems.javaschool.model.UserProfile;
+import ru.tsystems.javaschool.service.UserService;
 
 @Service
 public class UserDetailsServiceImpl implements UserDetailsService {
@@ -43,12 +43,8 @@ public class UserDetailsServiceImpl implements UserDetailsService {
 
     private List<GrantedAuthority> getGrantedAuthorities(User user){
         List<GrantedAuthority> authorities = new ArrayList<>();
-
-        for(UserProfile userProfile : user.getUserProfiles()){
-            LOG.info("UserProfile : {}",userProfile);
-            authorities.add(new SimpleGrantedAuthority("ROLE_"+userProfile.getType()));
-        }
-        LOG.info("authorities :{}",authorities);
+        authorities.add(new SimpleGrantedAuthority("ROLE_"+user.getRole()));
+        LOG.info("authorities : {} for user : {}",authorities, user.getLogin());
         return authorities;
     }
 }

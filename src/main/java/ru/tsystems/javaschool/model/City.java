@@ -24,6 +24,9 @@ public class City {
     @OneToMany(mappedBy = "city")
     private Set<Truck> trucks;
 
+    @OneToMany(mappedBy = "city")
+    private Set<Driver> drivers;
+
     public City() {
     }
 
@@ -65,5 +68,13 @@ public class City {
 
     public void setTrucks(Set<Truck> trucks) {
         this.trucks = trucks;
+    }
+
+    public Set<Driver> getDrivers() {
+        return drivers;
+    }
+
+    public void setDrivers(Set<Driver> drivers) {
+        this.drivers = drivers;
     }
 }
