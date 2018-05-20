@@ -8,11 +8,18 @@ import ru.tsystems.javaschool.model.User;
 import ru.tsystems.javaschool.repository.AbstractDao;
 import ru.tsystems.javaschool.repository.UserDao;
 
+import java.util.List;
+
 @Repository("userDao")
 public class UserDaoImpl extends AbstractDao<Integer, User> implements UserDao {
 
     public void save(User user) {
         persist(user);
+    }
+
+    @Override
+    public void delete(Integer id) {
+        delete(findById(id));
     }
 
     public User findById(int id) {
@@ -26,4 +33,10 @@ public class UserDaoImpl extends AbstractDao<Integer, User> implements UserDao {
         return (User) query.uniqueResult();
     }
 
+    @Override
+    @SuppressWarnings("unchecked")
+    public List<User> findAllUsers() {
+        Query query = getSession().createQuery("from User");
+        return query.list();
+    }
 }

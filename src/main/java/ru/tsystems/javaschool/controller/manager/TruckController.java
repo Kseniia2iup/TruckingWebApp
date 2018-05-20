@@ -1,4 +1,4 @@
-package ru.tsystems.javaschool.controller;
+package ru.tsystems.javaschool.controller.manager;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
@@ -21,39 +21,51 @@ import java.util.Locale;
 @Controller
 public class TruckController {
 
-    private static final String TRUCK_LIST_VIEW_PATH = "redirect:/listTrucks";
-    private static final String ADD_TRUCK_VIEW_PATH = "addtruck";
+    private static final String TRUCK_LIST_VIEW_PATH = "redirect:/manager/listTrucks";
+    private static final String ADD_TRUCK_VIEW_PATH = "newtruck";
+
+    private TruckService truckService;
+
+    private CityService cityService;
+
+    private MessageSource messageSource;
 
     @Autowired
-    TruckService truckService;
+    public void setTruckService(TruckService truckService) {
+        this.truckService = truckService;
+    }
 
     @Autowired
-    CityService cityService;
+    public void setCityService(CityService cityService) {
+        this.cityService = cityService;
+    }
 
     @Autowired
-    MessageSource messageSource;
+    public void setMessageSource(MessageSource messageSource) {
+        this.messageSource = messageSource;
+    }
 
-    @GetMapping(path = {"listTrucks"})
+    @GetMapping(path = {"/manager/listTrucks"})
     public String listOfTrucks(Model model) {
         List<Truck> trucks = truckService.findAllTrucks();
         model.addAttribute("trucks", trucks);
         return "alltrucks";
     }
 
-    @GetMapping(path = { "/delete-{reg_number}-truck" })
+    @GetMapping(path = { "manager/delete-{reg_number}-truck" })
     public String deleteTruck(@PathVariable String reg_number) {
         truckService.deleteTruckByRegNumber(reg_number);
         return TRUCK_LIST_VIEW_PATH;
     }
 
-    @GetMapping(path = { "/newTruck" })
+    @GetMapping(path = { "manager/newTruck" })
     public String newTruck(ModelMap model) {
         model.addAttribute("truck", new Truck());
         model.addAttribute("edit", false);
         return ADD_TRUCK_VIEW_PATH;
     }
 
-    @PostMapping(path = { "/newTruck" })
+    @PostMapping(path = { "manager/newTruck" })
     public String saveTruck(@ModelAttribute Truck truck, BindingResult result,
                                ModelMap model) {
 
@@ -79,30 +91,36 @@ public class TruckController {
         return TRUCK_LIST_VIEW_PATH;
     }
 
-    @GetMapping(path = { "/edit-{id}-truck" })
+    @GetMapping(path = { "manager/edit-{id}-truck" })
     public String editTruck(@PathVariable Integer id, ModelMap model) {
         model.addAttribute("truck", truckService.findTruckById(id));
         model.addAttribute("edit", true);
         return ADD_TRUCK_VIEW_PATH;
     }
 
-    @PostMapping(path = { "/edit-{id}-truck" })
+    @PostMapping(path = { "manager/edit-{id}-truck" })
     public String updateTruck(@Valid Truck truck, BindingResult result,
                                  ModelMap model, @PathVariable Integer id) {
 
         if (result.hasErrors()) {
+            model.addAttribute("truck", truckService.findTruckById(id));
+            model.addAttribute("edit", true);
             return ADD_TRUCK_VIEW_PATH;
         }
 
         if(!truckService.isTruckRegNumberUnique(truck.getId(), truck.getRegNumber())){
             FieldError regNumError = new FieldError("truck","reg_number",messageSource.getMessage("non.unique.reg_number", new String[]{truck.getRegNumber()}, Locale.getDefault()));
             result.addError(regNumError);
+            model.addAttribute("truck", truckService.findTruckById(id));
+            model.addAttribute("edit", true);
             return ADD_TRUCK_VIEW_PATH;
         }
 
         if (!truckService.isTruckRegNumberIsValid(truck.getId(), truck.getRegNumber())){
             FieldError regNumError = new FieldError("truck","reg_number",messageSource.getMessage("non.valid.reg_number", new String[]{truck.getRegNumber()}, Locale.getDefault()));
             result.addError(regNumError);
+            model.addAttribute("truck", truckService.findTruckById(id));
+            model.addAttribute("edit", true);
             return ADD_TRUCK_VIEW_PATH;
         }
 

@@ -13,6 +13,8 @@ import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
 import org.springframework.web.servlet.view.InternalResourceViewResolver;
 import org.springframework.web.servlet.view.JstlView;
+import ru.tsystems.javaschool.utils.CityIdToCityConverter;
+import ru.tsystems.javaschool.utils.TruckConverter;
 
 @Configuration
 @EnableWebMvc // Config support web-mvc
@@ -21,6 +23,9 @@ public class WebAppConfig extends WebMvcConfigurerAdapter {
 
     @Autowired
     CityIdToCityConverter cityIdToCityConverter;
+
+    @Autowired
+    TruckConverter truckConverter;
 
     @Bean
     public ViewResolver viewResolver() {
@@ -54,7 +59,7 @@ public class WebAppConfig extends WebMvcConfigurerAdapter {
     @Override
     public void addFormatters(FormatterRegistry registry)
     {
-        //registry.addConverter(roleToUserProfileConverter);
-        //registry.addConverter(cityIdToCityConverter);
+        registry.addConverter(truckConverter);
+        registry.addConverter(cityIdToCityConverter);
     }
 }

@@ -8,13 +8,89 @@
     <title>Admin page</title>
     <link href="<c:url value="/static/css/bootstrap.css" />" rel="stylesheet" />
     <link href="<c:url value="/static/css/app.css" />" rel="stylesheet" />
+    <link href="<c:url value="/static/css/menu.css" />" rel="stylesheet" />
 </head>
 <body>
-<div class="page-header"></div>
-<div class="success">
-    Dear <strong>${user}</strong>, Welcome to Driver Page.
-    <br/>
-    <a href="<c:url value="/logout" />">Logout</a>
+    <span style="font-size:30px;cursor:pointer" onclick="openNav()">&#9776;</span>
+
+<div id="mySidenav" class="sidenav">
+    <a href="javascript:void(0)" class="closebtn" onclick="closeNav()">&times;</a>
+    <ul>
+        <li><h4 style="color: #2b669a; text-align: center"><b>${user}</b></h4></li>
+        <br/>
+        <li><a href="<c:url value="/driver"/> ">Home</a></li>
+        <li><a href="<c:url value="/logout" />">Logout</a></li>
+    </ul>
 </div>
+<div class="container">
+    <div class="success">
+        <br/>
+        <h2>INFO</h2>
+        <table class="table table-hover">
+            <tr>
+                <td>PERSONAL NUMBER</td><td>TRUCK</td><td>ORDER ID</td><td></td>
+            </tr>
+            <tr>
+                <td>${driver.id}</td>
+                <td>${truck.regNumber}</td>
+                <td>${order.id}</td>
+                <c:choose>
+                    <c:when test="${order!=null&&truck!=null}">
+                            <td><a href="<c:url value='/driver/${driver.id}/setStatus' />" class="btn btn-success custom-width">
+                        ${driver.status}</a></td>
+                    </c:when>
+                    <c:otherwise/>
+                </c:choose>
+            </tr>
+        </table>
+        <br/>
+        <c:choose>
+            <c:when test="${drivers.size()!=0}">
+        <h3>CO-WORKERS</h3>
+        <table class="table table-hover">
+            <tr>
+                <td>PERSONAL NUMBER</td><td>NAME</td><td>SURNAME</td>
+            </tr>
+            <c:forEach items="${drivers}" var="coworker">
+            <tr>
+                <td>${coworker.id}</td>
+                <td>${coworker.name}</td>
+                <td>${coworker.surname}</td>
+            </tr>
+            </c:forEach>
+        </table>
+        <br/>
+            </c:when>
+            <c:otherwise/>
+        </c:choose>
+        <c:choose>
+            <c:when test="${waypoints.size()!=0}">
+        <h3>WAYPOINTS</h3>
+        <table class="table table-hover">
+            <tr>
+                <td>CARGO</td><td>DEPARTURE CITY</td><td>DESTINATION CITY</td>
+            </tr>
+            <c:forEach items="${waypoints}" var="waypoint">
+                <tr>
+                    <td>${waypoint.cargo.name}</td>
+                    <td>${waypoint.cityDep.name}</td>
+                    <td>${waypoint.cityDest.name}</td>
+                </tr>
+            </c:forEach>
+        </table>
+            </c:when>
+            <c:otherwise/>
+        </c:choose>
+    </div>
+</div>
+<script>
+    function openNav() {
+        document.getElementById("mySidenav").style.width = "250px";
+    }
+
+    function closeNav() {
+        document.getElementById("mySidenav").style.width = "0";
+    }
+</script>
 </body>
 </html>

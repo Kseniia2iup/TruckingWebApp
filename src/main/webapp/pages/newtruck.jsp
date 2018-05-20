@@ -10,10 +10,22 @@
     <title>Truck Registration Form</title>
     <link href="<c:url value="/static/css/bootstrap.css" />" rel="stylesheet" />
     <link href="<c:url value="/static/css/app.css" />" rel="stylesheet" />
+    <link href="<c:url value="/static/css/menu.css" />" rel="stylesheet" />
 </head>
 
 <body>
-<div class="page-header"></div>
+<span style="font-size:30px;cursor:pointer;float: left" onclick="openNav()">&#9776;</span>
+
+<div id="mySidenav" class="sidenav">
+    <a href="javascript:void(0)" class="closebtn" onclick="closeNav()">&times;</a>
+    <ul>
+        <li><a href="<c:url value="/manager/"/> ">Home</a></li>
+        <li><a href="<c:url value="/manager/listDrivers"/> ">Drivers</a></li>
+        <li><a href="<c:url value="/manager/listTrucks"/>">Trucks</a></li>
+        <li><a href="<c:url value="/manager/listOrders"/>">Orders</a></li>
+        <li><a href="<c:url value="/logout" />">Logout</a></li>
+    </ul>
+</div>
 <div class="container">
     <div class="success">
 <h2>Add Truck Form</h2>
@@ -51,8 +63,8 @@
         <div class="form-group col-md-12">
             <label class="col-md-3 control-lable" for="city">City</label>
             <div class="col-md-7">
-                <form:select id ="city" path="city.id" items="${cities}" class="form-control input-sm"
-                             itemLabel="name" itemValue="id"/>
+                <form:select id ="city" path="city" items="${cities}" itemLabel="name" itemValue="id" class="form-control input-sm"
+                            />
             </div>
         </div>
     </div>
@@ -84,8 +96,17 @@
 </form:form>
 <br/>
 <br/>
-Go back to <a href="<c:url value='/listTrucks' />">List of All Trucks</a>
+        <a href="<c:url value='/manager/listTrucks' />" class="btn btn-success custom-width">List of All Trucks</a>
 </div>
 </div>
+<script>
+    function openNav() {
+        document.getElementById("mySidenav").style.width = "250px";
+    }
+
+    function closeNav() {
+        document.getElementById("mySidenav").style.width = "0";
+    }
+</script>
 </body>
 </html>

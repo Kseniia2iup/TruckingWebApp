@@ -27,6 +27,12 @@ public class City {
     @OneToMany(mappedBy = "city")
     private Set<Driver> drivers;
 
+    @OneToMany(mappedBy = "cityDep")
+    private Set<Waypoint> waypointsDep;
+
+    @OneToMany(mappedBy = "cityDest")
+    private Set<Waypoint> waypointsDest;
+
     public City() {
     }
 
@@ -76,5 +82,21 @@ public class City {
 
     public void setDrivers(Set<Driver> drivers) {
         this.drivers = drivers;
+    }
+
+    public Set<Waypoint> getWaypointsDep() {
+        return waypointsDep;
+    }
+
+    public void setWaypointsDep(Set<Waypoint> waypointsDep) {
+        this.waypointsDep = waypointsDep;
+    }
+
+    public Set<Waypoint> getWaypointsDest() {
+        return waypointsDest;
+    }
+
+    public void setWaypointsDest(Set<Waypoint> waypointsDest) {
+        this.waypointsDest = waypointsDest;
     }
 }

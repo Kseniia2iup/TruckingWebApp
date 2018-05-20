@@ -8,6 +8,8 @@ import ru.tsystems.javaschool.model.User;
 import ru.tsystems.javaschool.repository.UserDao;
 import ru.tsystems.javaschool.service.UserService;
 
+import java.util.List;
+
 @Service("userService")
 @Transactional
 public class UserServiceImpl implements UserService {
@@ -31,6 +33,22 @@ public class UserServiceImpl implements UserService {
         dao.save(user);
     }
 
+    @Override
+    public void updateUser(User user) {
+        User entity = dao.findById(user.getId());
+        if(entity!=null){
+            entity.setLogin(user.getLogin());
+            entity.setPassword(user.getPassword());
+            //entity.setEmail(user.getEmail());
+            entity.setRole(user.getRole());
+        }
+    }
+
+    @Override
+    public void delete(Integer id) {
+        dao.delete(id);
+    }
+
     public User findById(int id) {
         return dao.findById(id);
     }
@@ -39,4 +57,21 @@ public class UserServiceImpl implements UserService {
         return dao.findByLogin(login);
     }
 
+    @Override
+    public boolean isUserValid(User user) {
+        return (user.getLogin()!=null && user.getPassword()!=null
+                && user.getLogin().length()>=3
+                && user.getPassword().length()>=5
+                && isUserLoginUnique(user.getLogin()));
+    }
+
+    @Override
+    public boolean isUserLoginUnique(String login) {
+        return findByLogin(login) == null;
+    }
+
+    @Override
+    public List<User> findAllUsers() {
+        return dao.findAllUsers();
+    }
 }

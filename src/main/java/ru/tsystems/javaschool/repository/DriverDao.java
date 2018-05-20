@@ -1,6 +1,8 @@
 package ru.tsystems.javaschool.repository;
 
 import ru.tsystems.javaschool.model.Driver;
+import ru.tsystems.javaschool.model.Order;
+import ru.tsystems.javaschool.model.Truck;
 
 import java.util.List;
 
@@ -17,4 +19,10 @@ public interface DriverDao {
     List<Driver> findAllDrivers();
 
     Integer getLastDriverId();
+
+    List<Driver> getAllFreeDriversForTruck(Truck truck);
+
+    List<Driver> getAllDriversOfTruck(Truck truck);
+
+    List<Driver> getAllDriversOfOrder(Order order);
 }

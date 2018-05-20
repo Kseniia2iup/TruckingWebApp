@@ -1,6 +1,9 @@
 package ru.tsystems.javaschool.service;
 
 import ru.tsystems.javaschool.model.Driver;
+import ru.tsystems.javaschool.model.Order;
+import ru.tsystems.javaschool.model.Truck;
+import ru.tsystems.javaschool.model.enums.DriverStatus;
 
 import java.util.List;
 
@@ -22,4 +25,13 @@ public interface DriverService {
 
     String generateDriverPassword();
 
+    List<Driver> findAllDriversSuitableForOrder(Order order);
+
+    List<Driver> getAllDriversOfTruck(Truck truck);
+
+    List<Driver> getAllDriversOfOrder(Order order);
+
+    List<Driver> findCoWorkers(Driver driver);
+
+    void setDriverStatus(Driver driver, DriverStatus newStatus);
 }

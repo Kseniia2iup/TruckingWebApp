@@ -8,6 +8,7 @@
     <title>AccessDenied page</title>
     <link href="<c:url value="/static/css/bootstrap.css" />" rel="stylesheet" />
     <link href="<c:url value="/static/css/app.css" />" rel="stylesheet" />
+    <link href="<c:url value="/static/css/menu.css" />" rel="stylesheet" />
 </head>
 <body>
 <div class="page-header"></div>

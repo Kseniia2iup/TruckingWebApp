@@ -5,6 +5,7 @@ import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import ru.tsystems.javaschool.model.Truck;
+import ru.tsystems.javaschool.model.enums.TruckStatus;
 import ru.tsystems.javaschool.repository.AbstractDao;
 import ru.tsystems.javaschool.repository.TruckDao;
 
@@ -15,14 +16,18 @@ public class TruckDaoImpl extends AbstractDao<Integer, Truck> implements TruckDa
 
     @Override
     public Truck findTruckById(int id) {
-        return getByKey(id);
+        Query query = getSession().createQuery("Select T from Truck T Join Fetch T.city" +
+                " WHERE T.id = :id");
+        query.setParameter("id", id);
+        return (Truck) query.uniqueResult();
     }
 
     @Override
     @Transactional(readOnly = true, propagation = Propagation.SUPPORTS)
     public Truck findTruckByRegNumber(String regNumber) {
-        Query query = getSession().createQuery("SELECT T FROM Truck T WHERE T.reg_number = :reg_number");
-        query.setParameter("reg_number", regNumber);
+        Query query = getSession().createQuery("SELECT T FROM Truck T Join Fetch T.city" +
+                " WHERE T.regNumber = :regNumber");
+        query.setParameter("regNumber", regNumber);
         return (Truck) query.uniqueResult();
     }
 
@@ -39,8 +44,8 @@ public class TruckDaoImpl extends AbstractDao<Integer, Truck> implements TruckDa
     @Override
     @Transactional(propagation = Propagation.MANDATORY)
     public void deleteTruckByRegNumber(String regNumber) {
-        Query query = getSession().createQuery("Delete Truck T WHERE T.reg_number = :reg_number");
-        query.setParameter("reg_number", regNumber);
+        Query query = getSession().createQuery("Delete Truck T WHERE T.regNumber = :regNumber");
+        query.setParameter("regNumber", regNumber);
         query.executeUpdate();
     }
 
@@ -48,7 +53,22 @@ public class TruckDaoImpl extends AbstractDao<Integer, Truck> implements TruckDa
     @SuppressWarnings("unchecked")
     @Transactional(readOnly = true, propagation = Propagation.SUPPORTS)
     public List<Truck> findAllTrucks() {
-        Query query = getSession().createQuery("Select T from Truck T Join Fetch T.city");
+        Query query = getSession().createQuery("Select T from Truck T Join Fetch T.city " +
+                " Order by T.regNumber");
+        return query.list();
+    }
+
+    /**
+     * Finds all trucks with OK condition
+     * @return list of suitable trucks
+     */
+    @Override
+    @SuppressWarnings("unchecked")
+    @Transactional(readOnly = true, propagation = Propagation.SUPPORTS)
+    public List<Truck> findAllOKTrucks() {
+        Query query = getSession().createQuery("Select T from Truck T Join Fetch T.city " +
+                "Where T.condition = :condition Order by T.regNumber");
+        query.setParameter("condition", TruckStatus.OK);
         return query.list();
     }
 }

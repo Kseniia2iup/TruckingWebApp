@@ -1,5 +1,6 @@
 package ru.tsystems.javaschool.repository;
 
+import ru.tsystems.javaschool.model.Order;
 import ru.tsystems.javaschool.model.Truck;
 
 import java.util.List;
@@ -17,4 +18,6 @@ public interface TruckDao {
     void deleteTruckByRegNumber(String regNumber);
 
     List<Truck> findAllTrucks();
+
+    List<Truck> findAllOKTrucks();
 }

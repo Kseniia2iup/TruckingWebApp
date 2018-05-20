@@ -1,5 +1,6 @@
 package ru.tsystems.javaschool.service;
 
+import ru.tsystems.javaschool.model.Order;
 import ru.tsystems.javaschool.model.Truck;
 
 import java.util.List;
@@ -21,4 +22,6 @@ public interface TruckService {
     boolean isTruckRegNumberUnique(Integer id, String reg_number);
 
     boolean isTruckRegNumberIsValid(Integer id, String reg_number);
+
+    List<Truck> findAllTrucksReadyForOrder(Order order);
 }

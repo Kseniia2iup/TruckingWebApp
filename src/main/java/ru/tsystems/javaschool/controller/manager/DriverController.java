@@ -1,4 +1,4 @@
-package ru.tsystems.javaschool.controller;
+package ru.tsystems.javaschool.controller.manager;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -15,13 +15,14 @@ import ru.tsystems.javaschool.service.CityService;
 import ru.tsystems.javaschool.service.DriverService;
 import ru.tsystems.javaschool.service.UserService;
 
+import javax.validation.Valid;
 import java.util.List;
 
 @Controller
 public class DriverController {
 
-    private static final String DRIVER_LIST_VIEW_PATH = "redirect:/listDrivers";
-    private static final String ADD_DRIVER_VIEW_PATH = "adddriver";
+    private static final String DRIVER_LIST_VIEW_PATH = "redirect:/manager/listDrivers";
+    private static final String ADD_DRIVER_VIEW_PATH = "newdriver";
 
     private DriverService driverService;
 
@@ -44,27 +45,28 @@ public class DriverController {
         this.cityService = cityService;
     }
 
-    @RequestMapping(path = "listDrivers")
+    @RequestMapping(path = "manager/listDrivers")
     public String listOfDrivers(Model model){
         model.addAttribute("drivers", driverService.findAllDrivers());
         return "alldrivers";
     }
 
 
-    @GetMapping(path = { "/delete-{id}-driver" })
+    @GetMapping(path = { "manager/delete-{id}-driver" })
     public String deleteTruck(@PathVariable Integer id) {
         driverService.deleteDriver(id);
+        userService.delete(id);
         return DRIVER_LIST_VIEW_PATH;
     }
 
-    @GetMapping(path = { "/newDriver" })
+    @GetMapping(path = { "manager/newDriver" })
     public String newDriver(ModelMap model) {
         model.addAttribute("driver", new Driver());
         model.addAttribute("edit", false);
         return ADD_DRIVER_VIEW_PATH;
     }
 
-    @PostMapping(path = { "/newDriver" })
+    @PostMapping(path = { "manager/newDriver" })
     public String saveDriver(@ModelAttribute Driver driver, BindingResult result,
                             ModelMap model) {
 
@@ -77,10 +79,37 @@ public class DriverController {
         user.setRole(Role.DRIVER);
         userService.save(user);
         driver.setId(user.getId());
+        driver.setWorkedThisMonth(0);
+        driver.setStatus(DriverStatus.REST);
         driverService.saveDriver(driver);
 
         model.addAttribute("success", "Driver " + driver.getName()
                 + " " + driver.getSurname() + " added successfully");
+        return DRIVER_LIST_VIEW_PATH;
+    }
+
+
+    @GetMapping(value = { "manager/edit-{id}-driver" })
+    public String editDriver(@PathVariable Integer id, ModelMap model) {
+        Driver driver = driverService.findDriverById(id);
+        model.addAttribute("driver", driver);
+        model.addAttribute("edit", true);
+        return ADD_DRIVER_VIEW_PATH;
+    }
+
+    @PostMapping(value = { "manager/edit-{id}-driver" })
+    public String editDriver(@Valid Driver driver, BindingResult result,
+                             ModelMap model, @PathVariable Integer id) {
+
+        if (result.hasErrors()) {
+            model.addAttribute("edit", true);
+            return ADD_DRIVER_VIEW_PATH;
+        }
+        Driver entityDriver = driverService.findDriverById(id);
+        driver.setStatus(entityDriver.getStatus());
+        driver.setWorkedThisMonth(entityDriver.getWorkedThisMonth());
+        driverService.updateDriver(driver);
+
         return DRIVER_LIST_VIEW_PATH;
     }
 

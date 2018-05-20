@@ -2,6 +2,8 @@ package ru.tsystems.javaschool.repository.Impl;
 
 import org.hibernate.Query;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 import ru.tsystems.javaschool.model.City;
 import ru.tsystems.javaschool.repository.AbstractDao;
 import ru.tsystems.javaschool.repository.CityDao;
@@ -12,6 +14,7 @@ import java.util.List;
 public class CityDaoImpl extends AbstractDao<Integer, City> implements CityDao {
 
     @Override
+    @Transactional(readOnly = true, propagation = Propagation.SUPPORTS)
     public City findCityById(int id) {
         return getByKey(id);
     }
@@ -25,6 +28,7 @@ public class CityDaoImpl extends AbstractDao<Integer, City> implements CityDao {
 
     @Override
     @SuppressWarnings("unchecked")
+    @Transactional(readOnly = true, propagation = Propagation.SUPPORTS)
     public List<City> findAllCities() {
         Query query = getSession().createQuery("From City");
         return query.list();

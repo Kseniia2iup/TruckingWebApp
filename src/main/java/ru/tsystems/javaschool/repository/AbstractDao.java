@@ -42,6 +42,7 @@ public abstract class AbstractDao <PK extends Serializable, T> {
         getSession().update(entity);
     }
 
+    @Transactional(propagation = Propagation.MANDATORY)
     public void delete(T entity) {
         getSession().delete(entity);
     }

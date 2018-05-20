@@ -25,8 +25,7 @@ public class Driver {
     @Enumerated(EnumType.STRING)
     private DriverStatus status;
 
-
-    @OneToOne(cascade = {CascadeType.REMOVE, CascadeType.REMOVE})
+    @OneToOne(cascade = {CascadeType.REMOVE, CascadeType.REMOVE}, fetch = FetchType.LAZY)
     @JoinColumn(name="id", nullable=false)
     private User user;
 
@@ -37,6 +36,13 @@ public class Driver {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "truck_id")
     private Truck currentTruck;
+
+    @OneToOne(mappedBy = "driver", fetch = FetchType.LAZY)
+    private OrderHistory history;
+
+    @ManyToOne( fetch = FetchType.LAZY)
+    @JoinColumn(name = "order_id")
+    private Order order;
 
     public Driver() {
     }
@@ -103,5 +109,21 @@ public class Driver {
 
     public void setUser(User user) {
         this.user = user;
+    }
+
+    public OrderHistory getHistory() {
+        return history;
+    }
+
+    public void setHistory(OrderHistory history) {
+        this.history = history;
+    }
+
+    public Order getOrder() {
+        return order;
+    }
+
+    public void setOrder(Order order) {
+        this.order = order;
     }
 }

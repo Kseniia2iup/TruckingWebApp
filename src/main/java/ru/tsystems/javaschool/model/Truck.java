@@ -15,13 +15,13 @@ public class Truck {
     private Integer id;
 
     @Column(name = "reg_number", length = 7, unique = true, nullable = false)
-    private String reg_number;
+    private String regNumber;
 
     @Column(name = "shift_period", nullable = false)
-    private Integer shift_period;
+    private Integer shiftPeriod;
 
     @Column(name = "capacity_ton", nullable = false)
-    private Integer capacity_ton;
+    private Integer capacityTon;
 
     @Column(name = "truck_condition", nullable = false)
     @Enumerated(EnumType.STRING)
@@ -31,9 +31,11 @@ public class Truck {
     @JoinColumn(name = "city_id")
     private City city;
 
-    @OneToMany(mappedBy = "currentTruck")
+    @OneToMany(mappedBy = "currentTruck", fetch = FetchType.LAZY)
     private Set<Driver> drivers;
 
+    @OneToOne(mappedBy = "truck")
+    private Order order;
 
     public Truck() {
     }
@@ -55,27 +57,27 @@ public class Truck {
     }
 
     public String getRegNumber() {
-        return reg_number;
+        return regNumber;
     }
 
-    public void setRegNumber(String reg_number) {
-        this.reg_number = reg_number;
+    public void setRegNumber(String regNumber) {
+        this.regNumber = regNumber;
     }
 
     public Integer getShiftPeriod() {
-        return shift_period;
+        return shiftPeriod;
     }
 
-    public void setShiftPeriod(Integer shift_period) {
-        this.shift_period = shift_period;
+    public void setShiftPeriod(Integer shiftPeriod) {
+        this.shiftPeriod = shiftPeriod;
     }
 
     public Integer getCapacityTon() {
-        return capacity_ton;
+        return capacityTon;
     }
 
-    public void setCapacityTon(Integer capacity_ton) {
-        this.capacity_ton = capacity_ton;
+    public void setCapacityTon(Integer capacityTon) {
+        this.capacityTon = capacityTon;
     }
 
     public TruckStatus getCondition() {
@@ -92,5 +94,13 @@ public class Truck {
 
     public void setDrivers(Set<Driver> drivers) {
         this.drivers = drivers;
+    }
+
+    public Order getOrder() {
+        return order;
+    }
+
+    public void setOrder(Order order) {
+        this.order = order;
     }
 }

@@ -11,4 +11,6 @@ public interface CityService {
     City findCityByName(String name);
 
     List<City> findAllCities();
+
+    Double distanceBetweenTwoCity(City cityA, City cityB);
 }
