@@ -27,22 +27,18 @@ public abstract class AbstractDao <PK extends Serializable, T> {
     }
 
     @SuppressWarnings("unchecked")
-    @Transactional(readOnly = true, propagation = Propagation.SUPPORTS)
     public T getByKey(PK key) {
         return (T) getSession().get(persistentClass, key);
     }
 
-    @Transactional(propagation = Propagation.MANDATORY)
     public void persist(T entity) {
         getSession().persist(entity);
     }
 
-    @Transactional(propagation = Propagation.MANDATORY)
     public void update(T entity) {
         getSession().update(entity);
     }
 
-    @Transactional(propagation = Propagation.MANDATORY)
     public void delete(T entity) {
         getSession().delete(entity);
     }

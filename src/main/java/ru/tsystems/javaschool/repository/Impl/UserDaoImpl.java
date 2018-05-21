@@ -13,11 +13,13 @@ import java.util.List;
 @Repository("userDao")
 public class UserDaoImpl extends AbstractDao<Integer, User> implements UserDao {
 
+    @Transactional(propagation = Propagation.MANDATORY)
     public void save(User user) {
         persist(user);
     }
 
     @Override
+    @Transactional(propagation = Propagation.MANDATORY)
     public void delete(Integer id) {
         delete(findById(id));
     }

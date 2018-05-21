@@ -5,7 +5,7 @@
 <html>
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
-    <title>Admin page</title>
+    <title>Driver page</title>
     <link href="<c:url value="/static/css/bootstrap.css" />" rel="stylesheet" />
     <link href="<c:url value="/static/css/app.css" />" rel="stylesheet" />
     <link href="<c:url value="/static/css/menu.css" />" rel="stylesheet" />
@@ -28,18 +28,26 @@
         <h2>INFO</h2>
         <table class="table table-hover">
             <tr>
-                <td>PERSONAL NUMBER</td><td>TRUCK</td><td>ORDER ID</td><td></td>
+                <td>PERSONAL NUMBER</td><td>TRUCK</td><td></td><td>CURRENT CITY</td><td>ORDER ID</td><td>CURRENT STATUS</td>
             </tr>
             <tr>
                 <td>${driver.id}</td>
-                <td>${truck.regNumber}</td>
-                <td>${order.id}</td>
                 <c:choose>
                     <c:when test="${order!=null&&truck!=null}">
-                            <td><a href="<c:url value='/driver/${driver.id}/setStatus' />" class="btn btn-success custom-width">
-                        ${driver.status}</a></td>
+                        <td>${truck.regNumber}</td>
+                        <td><a href="<c:url value='/driver/${driver.id}/truckIsBroken' />" class="btn btn-danger custom-width">
+                            Mark As Broken</a></td>
+                        <td>${truck.city.name}</td>
+                        <td>${order.id}</td>
+                        <td><a href="<c:url value='/driver/${driver.id}/setStatus' />" class="btn btn-success custom-width">
+                            ${driver.status}</a></td>
                     </c:when>
-                    <c:otherwise/>
+                    <c:otherwise>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td>${driver.status}</td>
+                    </c:otherwise>
                 </c:choose>
             </tr>
         </table>
@@ -68,13 +76,38 @@
         <h3>WAYPOINTS</h3>
         <table class="table table-hover">
             <tr>
-                <td>CARGO</td><td>DEPARTURE CITY</td><td>DESTINATION CITY</td>
+                <td>CARGO</td><td>DEPARTURE CITY</td><td></td><td>DESTINATION CITY</td><td></td>
             </tr>
             <c:forEach items="${waypoints}" var="waypoint">
                 <tr>
                     <td>${waypoint.cargo.name}</td>
                     <td>${waypoint.cityDep.name}</td>
+                    <c:choose>
+                        <c:when test="${waypoint.cargo.delivery_status=='PREPARED'}">
+                            <td><a href="<c:url value='/driver/${waypoint.cargo.id}/loaded' />" class="btn btn-success custom-width">
+                                    SHIPPED</a></td>
+                        </c:when>
+                        <c:otherwise>
+                            <td>SHIPPED</td>
+                        </c:otherwise>
+                    </c:choose>
                     <td>${waypoint.cityDest.name}</td>
+                    <c:choose>
+                    <c:when test="${waypoint.cargo.delivery_status=='SHIPPED'}">
+                    <td><a href="<c:url value='/driver/${waypoint.cargo.id}/unloaded' />" class="btn btn-success custom-width">
+                        DELIVERED</a></td>
+                    </c:when>
+                        <c:otherwise>
+                            <c:choose>
+                                <c:when test="${waypoint.cargo.delivery_status=='PREPARED'}">
+                                </c:when>
+                                <c:otherwise>
+                                    <td>DELIVERED</td>
+                                </c:otherwise>
+                            </c:choose>
+
+                        </c:otherwise>
+                    </c:choose>
                 </tr>
             </c:forEach>
         </table>

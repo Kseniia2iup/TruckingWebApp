@@ -27,7 +27,7 @@ public class Cargo {
     @JoinColumn(name = "order_id")
     private Order order;
 
-    @OneToOne(mappedBy = "cargo")
+    @OneToOne(cascade = {CascadeType.REMOVE, CascadeType.REMOVE}, mappedBy = "cargo")
     private Waypoint waypoint;
 
     public Cargo() {

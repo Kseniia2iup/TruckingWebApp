@@ -23,16 +23,19 @@ public class WaypointDaoImpl extends AbstractDao<Integer, Waypoint> implements W
     }
 
     @Override
+    @Transactional(propagation = Propagation.MANDATORY)
     public void deleteWaypoint(Integer id) {
         delete(findWaypointById(id));
     }
 
     @Override
+    @Transactional(propagation = Propagation.MANDATORY)
     public void saveWaypoint(Waypoint waypoint) {
         persist(waypoint);
     }
 
     @Override
+    @Transactional(propagation = Propagation.MANDATORY)
     public void updateWaypoint(Waypoint waypoint) {
         update(waypoint);
     }

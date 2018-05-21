@@ -23,8 +23,11 @@
 		<li><a href="<c:url value="/logout" />">Logout</a></li>
 	</ul>
 </div>
+<div class="container">
+	<div class="success">
 <div class="generic-container">
-	<div class="well lead">User Registration Form</div>
+	<h2>User Registration Form</h2>
+	<br />
 	<form:form method="POST" modelAttribute="user" class="form-horizontal">
 		<form:input type="hidden" path="id" id="id"/>
 
@@ -83,6 +86,8 @@
 			</div>
 		</div>
 	</form:form>
+</div>
+	</div>
 </div>
 <script>
     function openNav() {

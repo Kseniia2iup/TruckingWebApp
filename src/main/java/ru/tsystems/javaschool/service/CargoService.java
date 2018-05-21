@@ -1,6 +1,7 @@
 package ru.tsystems.javaschool.service;
 
 import ru.tsystems.javaschool.model.Cargo;
+import ru.tsystems.javaschool.model.enums.CargoStatus;
 
 import java.util.List;
 
@@ -15,4 +16,6 @@ public interface CargoService {
     void updateCargo(Cargo cargo);
 
     List<Cargo> findAllCargoesOfOrder(Integer orderId);
+
+    String setCargoStatus(Cargo cargo, CargoStatus newStatus);
 }

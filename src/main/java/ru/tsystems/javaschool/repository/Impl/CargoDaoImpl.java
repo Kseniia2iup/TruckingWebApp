@@ -17,22 +17,25 @@ public class CargoDaoImpl extends AbstractDao<Integer, Cargo> implements CargoDa
     @Transactional(readOnly = true, propagation = Propagation.SUPPORTS)
     public Cargo findCargoById(Integer id) {
         Query query = getSession().createQuery("Select C from Cargo C " +
-                "Join Fetch C.order Join Fetch C.waypoints W Join Fetch W.cityDep Join Fetch W.cityDest WHERE C.id = :id");
+                "Join Fetch C.order Join Fetch C.waypoint W Join Fetch W.cityDep Join Fetch W.cityDest WHERE C.id = :id");
         query.setParameter("id", id);
         return (Cargo) query.uniqueResult();
     }
 
     @Override
+    @Transactional(propagation = Propagation.MANDATORY)
     public void deleteCargo(Integer id) {
         delete(findCargoById(id));
     }
 
     @Override
+    @Transactional(propagation = Propagation.MANDATORY)
     public void saveCargo(Cargo cargo) {
         persist(cargo);
     }
 
     @Override
+    @Transactional(propagation = Propagation.MANDATORY)
     public void updateCargo(Cargo cargo) {
         update(cargo);
     }

@@ -78,7 +78,7 @@ COLLATE = utf8mb4_0900_ai_ci;
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS `trucking`.`orders` (
   `id` INT(11) NOT NULL AUTO_INCREMENT,
-  `order_status` ENUM('CREATED', 'IN_PROCESS', 'DONE') NOT NULL,
+  `order_status` ENUM('CREATED', 'IN_PROCESS', 'INTERRUPTED', 'DONE') NOT NULL,
   `truck_id` INT(11) NULL DEFAULT NULL,
   PRIMARY KEY (`id`),
   UNIQUE INDEX `id_UNIQUE` (`id` ASC),

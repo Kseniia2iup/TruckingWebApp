@@ -6,9 +6,13 @@ import org.springframework.transaction.annotation.Transactional;
 import ru.tsystems.javaschool.model.Cargo;
 import ru.tsystems.javaschool.model.Order;
 import ru.tsystems.javaschool.model.Truck;
+import ru.tsystems.javaschool.model.enums.CargoStatus;
+import ru.tsystems.javaschool.model.enums.OrderStatus;
+import ru.tsystems.javaschool.model.enums.TruckStatus;
 import ru.tsystems.javaschool.repository.CargoDao;
 import ru.tsystems.javaschool.repository.OrderDao;
 import ru.tsystems.javaschool.repository.TruckDao;
+import ru.tsystems.javaschool.service.OrderService;
 import ru.tsystems.javaschool.service.TruckService;
 
 import java.util.ArrayList;
@@ -24,6 +28,8 @@ public class TruckServiceImpl implements TruckService {
 
     private OrderDao orderDao;
 
+    private OrderService orderService;
+
     private CargoDao cargoDao;
 
     @Autowired
@@ -34,6 +40,11 @@ public class TruckServiceImpl implements TruckService {
     @Autowired
     public void setTruckDao(TruckDao truckDao) {
         this.truckDao = truckDao;
+    }
+
+    @Autowired
+    public void setOrderService(OrderService orderService) {
+        this.orderService = orderService;
     }
 
     @Autowired
@@ -96,7 +107,8 @@ public class TruckServiceImpl implements TruckService {
         if(cargoes!=null) {
             for (Cargo cargo : cargoes
                     ) {
-                if (cargo.getWeight() > cargoMaxWeightKg) {
+                if (!cargo.getDelivery_status().equals(CargoStatus.DELIVERED)&&
+                        (cargo.getWeight() > cargoMaxWeightKg)) {
                     cargoMaxWeightKg = cargo.getWeight();
                 }
             }
@@ -111,5 +123,33 @@ public class TruckServiceImpl implements TruckService {
             }
         }
         return result;
+    }
+
+    /**
+     * Set Truck status as FAULT, remove all Drivers and Truck from Order, set Order Status
+     * as INTERRUPTED, mark all SHIPPED Cargoes as PREPARED and change their cities of
+     * departure to the Truck's current City
+     * @param id of Truck that was broken
+     */
+    @Override
+    public void markTruckAsBrokenWhileOrder(Integer id) {
+        Truck entityTruck = truckDao.findTruckById(id);
+        Order order = entityTruck.getOrder();
+        List<Cargo> cargoes = cargoDao.findAllCargoesOfOrder(order.getId());
+        for (Cargo cargo: cargoes
+             ) {
+            if(cargo.getDelivery_status().equals(CargoStatus.SHIPPED)) {
+                cargo.setDelivery_status(CargoStatus.PREPARED);
+                cargo.getWaypoint().setCityDep(entityTruck.getCity());
+                cargoDao.updateCargo(cargo);
+            }
+        }
+
+        orderService.removeTruckAndDriversFromOrder(order);
+        order.setOrderStatus(OrderStatus.INTERRUPTED);
+        orderService.updateOrder(order);
+
+        entityTruck.setCondition(TruckStatus.FAULTY);
+        truckDao.updateTruck(entityTruck);
     }
 }

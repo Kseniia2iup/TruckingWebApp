@@ -12,5 +12,5 @@ public interface CityService {
 
     List<City> findAllCities();
 
-    Double distanceBetweenTwoCity(City cityA, City cityB);
+    Double distanceBetweenTwoCities(City cityA, City cityB);
 }

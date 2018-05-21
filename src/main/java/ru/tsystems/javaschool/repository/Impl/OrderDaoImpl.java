@@ -24,16 +24,19 @@ public class OrderDaoImpl extends AbstractDao<Integer, Order> implements OrderDa
     }
 
     @Override
+    @Transactional(propagation = Propagation.MANDATORY)
     public void deleteOrder(Integer id) {
         delete(findOrderById(id));
     }
 
     @Override
+    @Transactional(propagation = Propagation.MANDATORY)
     public void saveOrder(Order order) {
         persist(order);
     }
 
     @Override
+    @Transactional(propagation = Propagation.MANDATORY)
     public void updateOrder(Order order) {
         update(order);
     }

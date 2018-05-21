@@ -13,6 +13,8 @@ import java.util.List;
 @Transactional
 public class CityServiceImpl implements CityService {
 
+    private static final Double EARTH_RADIUS = 6371d;
+
     private CityDao cityDao;
 
     @Autowired
@@ -36,7 +38,7 @@ public class CityServiceImpl implements CityService {
     }
 
     @Override
-    public Double distanceBetweenTwoCity(City cityA, City cityB) {
+    public Double distanceBetweenTwoCities(City cityA, City cityB) {
 
         if(cityA.equals(cityB)){
             return 0d;
@@ -47,9 +49,7 @@ public class CityServiceImpl implements CityService {
         Double latitudeB = cityB.getLatitude();
         Double longitudeB = cityB.getLongitude();
 
-        Double earthRadius = 6371d;
-
-        return earthRadius*2*Math.asin(Math.sqrt(Math.pow(Math.sin((
+        return EARTH_RADIUS*2*Math.asin(Math.sqrt(Math.pow(Math.sin((
                 latitudeA-Math.abs(latitudeB))*Math.PI/180/2),2)+Math.cos(latitudeA*Math.PI/180)
                 *Math.cos(Math.abs(latitudeB)*Math.PI/180)*Math.pow(Math.sin((longitudeA-longitudeB)
                 *Math.PI/180/2),2)));

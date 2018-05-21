@@ -47,11 +47,32 @@
         </table>
         <br/>
         <c:choose>
-            <c:when test="${order.orderStatus=='CREATED'}">
+            <c:when test="${order.orderStatus=='IN_PROCESS' && truck!=null}">
+        <br/>
+        <h2>TRUCK INFO</h2>
+        <table class="table table-hover">
+            <tr>
+                <td>REG NUMBER</td><td>CURRENT CITY</td>
+            </tr>
+            <tr>
+                <td>${truck.regNumber}</td>
+                <td>${truck.city.name}</td>
+            </tr>
+        </table>
+            </c:when>
+            <c:otherwise/>
+        </c:choose>
+        <c:choose>
+            <c:when test="${order.orderStatus=='CREATED' || order.orderStatus=='INTERRUPTED'}">
                 <c:choose>
                     <c:when test="${order.truck==null}">
+                        <c:choose>
+                            <c:when test="${order.orderStatus!='INTERRUPTED'}">
                         <a href="<c:url value='/manager/${order.id}/newCargo' />" class="btn btn-success custom-width">
                             Add Cargo</a>
+                            </c:when>
+                        <c:otherwise/>
+                        </c:choose>
                         <c:choose>
                             <c:when test="${cargoes.size()!=0}">
                                 <br/>
@@ -70,10 +91,6 @@
                             Add Drivers</a>
                     </c:otherwise>
                 </c:choose>
-                <br/>
-                <br/>
-                <a href="<c:url value="/manager/${order.id}/cancel"/> " class="btn btn-danger custom-width">
-                    Delete Order</a>
             </c:when>
             <c:otherwise/>
         </c:choose>

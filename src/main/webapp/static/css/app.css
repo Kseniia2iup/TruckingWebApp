@@ -13,6 +13,9 @@ body, #mainWrapper {
 body, #mainWrapper, .form-control{
 	font-size:12px!important;
 }
+li{
+    list-style-type: none;
+}
 
 #mainWrapper {
 	/*height: 720px; Without explicit px values, % in children's does not work*/

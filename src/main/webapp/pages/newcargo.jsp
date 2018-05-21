@@ -75,14 +75,6 @@
                     <br />
                     <a href="<c:url value="/manager/${order.id}/listOrderCargoes"/> " class="btn btn-danger custom-width">
                         Cancel</a>
-                    <br/>
-                    <br/>
-                    <a href="<c:url value="/manager/${order.id}/cancel"/> " class="btn btn-danger custom-width">
-                        Delete Order</a>
-                    <br/>
-                    <br/>
-                    <a href="<c:url value="/manager/listOrders"/> " class="btn btn-success custom-width">
-                        All Orders</a>
                 </div>
             </div>
         </form:form>

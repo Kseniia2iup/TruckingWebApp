@@ -32,11 +32,13 @@ public class TruckDaoImpl extends AbstractDao<Integer, Truck> implements TruckDa
     }
 
     @Override
+    @Transactional(propagation = Propagation.MANDATORY)
     public void saveTruck(Truck truck) {
         persist(truck);
     }
 
     @Override
+    @Transactional(propagation = Propagation.MANDATORY)
     public void updateTruck(Truck truck) {
         update(truck);
     }

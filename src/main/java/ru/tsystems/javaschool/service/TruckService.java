@@ -24,4 +24,6 @@ public interface TruckService {
     boolean isTruckRegNumberIsValid(Integer id, String reg_number);
 
     List<Truck> findAllTrucksReadyForOrder(Order order);
+
+    void markTruckAsBrokenWhileOrder(Integer id);
 }

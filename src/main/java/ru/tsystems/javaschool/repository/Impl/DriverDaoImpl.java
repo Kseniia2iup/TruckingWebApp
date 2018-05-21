@@ -19,12 +19,13 @@ public class DriverDaoImpl extends AbstractDao<Integer, Driver> implements Drive
     @Transactional(readOnly = true, propagation = Propagation.SUPPORTS)
     public Driver findDriverById(Integer id) {
         Query query = getSession().createQuery("Select D from Driver D Join Fetch D.user " +
-                "Join Fetch D.city Left Join Fetch D.currentTruck WHERE D.id = :id");
+                "Left Join Fetch D.order Join Fetch D.city Left Join Fetch D.currentTruck WHERE D.id = :id");
         query.setParameter("id", id);
         return (Driver) query.uniqueResult();
     }
 
     @Override
+    @Transactional(propagation = Propagation.MANDATORY)
     public void deleteDriver(Integer id) {
         Query query = getSession().createQuery("Delete Driver D WHERE D.id = :id");
         query.setParameter("id", id);
@@ -32,11 +33,13 @@ public class DriverDaoImpl extends AbstractDao<Integer, Driver> implements Drive
     }
 
     @Override
+    @Transactional(propagation = Propagation.MANDATORY)
     public void saveDriver(Driver driver) {
         persist(driver);
     }
 
     @Override
+    @Transactional(propagation = Propagation.MANDATORY)
     public void updateDriver(Driver driver) {
         update(driver);
     }
@@ -46,7 +49,7 @@ public class DriverDaoImpl extends AbstractDao<Integer, Driver> implements Drive
     @Transactional(readOnly = true, propagation = Propagation.SUPPORTS)
     public List<Driver> findAllDrivers() {
         Query query = getSession().createQuery("Select D from Driver D Join Fetch D.user " +
-                "Join Fetch D.city Left Join Fetch D.currentTruck Order by D.name");
+                "Left Join Fetch D.order Join Fetch D.city Left Join Fetch D.currentTruck Order by D.name");
         return query.list();
     }
 
@@ -66,7 +69,7 @@ public class DriverDaoImpl extends AbstractDao<Integer, Driver> implements Drive
     @Transactional(readOnly = true, propagation = Propagation.SUPPORTS)
     public List<Driver> getAllFreeDriversForTruck(Truck truck) {
         Query query = getSession().createQuery("Select D from Driver D Join Fetch D.city " +
-                "Left Join Fetch D.history Left Join Fetch D.currentTruck " +
+                "Left Join Fetch D.history Left Join Fetch D.currentTruck Left Join Fetch D.order " +
                 "Where D.currentTruck is null AND D.city = :truck_city Order by D.name");
         query.setParameter("truck_city", truck.getCity());
         return query.list();
@@ -76,7 +79,7 @@ public class DriverDaoImpl extends AbstractDao<Integer, Driver> implements Drive
     @Transactional(readOnly = true, propagation = Propagation.SUPPORTS)
     public List<Driver> getAllDriversOfTruck(Truck truck) {
         Query query = getSession().createQuery("Select D from Driver D Join Fetch D.city " +
-                "Left Join Fetch D.currentTruck Where D.currentTruck = :truck");
+                "Left Join Fetch D.order Left Join Fetch D.currentTruck Where D.currentTruck = :truck");
         query.setParameter("truck", truck);
         return query.list();
     }
@@ -85,7 +88,7 @@ public class DriverDaoImpl extends AbstractDao<Integer, Driver> implements Drive
     @Transactional(readOnly = true, propagation = Propagation.SUPPORTS)
     public List<Driver> getAllDriversOfOrder(Order order) {
         Query query = getSession().createQuery("Select D from Driver D Join Fetch D.city " +
-                "Left Join Fetch D.currentTruck Where D.order = :order");
+                "Left Join Fetch D.order Left Join Fetch D.currentTruck Where D.order = :order");
         query.setParameter("order", order);
         return query.list();
     }

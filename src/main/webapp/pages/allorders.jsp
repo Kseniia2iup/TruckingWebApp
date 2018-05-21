@@ -44,11 +44,9 @@
                     <td>${order.orderStatus}</td>
                     <td>${order.truck.regNumber}</td>
                     <c:choose>
-                        <c:when test="${order.orderStatus=='CREATED'}">
+                        <c:when test="${order.orderStatus=='CREATED'||order.orderStatus=='INTERRUPTED'}">
                             <td><a href="<c:url value='/manager/${order.id}/listOrderCargoes' />" class="btn btn-success custom-width">
                                 Complete</a></td>
-                            <td><a href="<c:url value='/manager/${order.id}/cancel' />" class="btn btn-danger custom-width">
-                                Delete</a></td>
                         </c:when>
                         <c:otherwise>
                             <td><a href="<c:url value='/manager/${order.id}/listOrderCargoes' />" class="btn btn-success custom-width">

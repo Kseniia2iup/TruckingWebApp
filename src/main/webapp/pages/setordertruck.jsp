@@ -46,10 +46,6 @@
                     <input type="submit" class="btn btn-primary btn-sm" value="Add Truck"/>
                     <br/>
                     <br/>
-                    <a href="<c:url value="/manager/${order.id}/cancel"/> " class="btn btn-danger custom-width">
-                        Delete Order</a>
-                    <br/>
-                    <br/>
                     <a href="<c:url value="/manager/listOrders"/> " class="btn btn-success custom-width">
                         All Orders</a>
                 </div>

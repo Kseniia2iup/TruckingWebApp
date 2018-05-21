@@ -25,11 +25,13 @@ public class OrderHistoryDaoImpl extends AbstractDao<Integer, OrderHistory> impl
     }
 
     @Override
+    @Transactional(propagation = Propagation.MANDATORY)
     public void saveHistory(OrderHistory orderHistory) {
         persist(orderHistory);
     }
 
     @Override
+    @Transactional(propagation = Propagation.MANDATORY)
     public void updateHistory(OrderHistory orderHistory) {
         update(orderHistory);
     }

@@ -4,9 +4,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.tsystems.javaschool.model.*;
-import ru.tsystems.javaschool.repository.DriverDao;
-import ru.tsystems.javaschool.repository.OrderDao;
-import ru.tsystems.javaschool.repository.TruckDao;
+import ru.tsystems.javaschool.model.enums.CargoStatus;
+import ru.tsystems.javaschool.model.enums.DriverStatus;
+import ru.tsystems.javaschool.repository.*;
 import ru.tsystems.javaschool.service.CityService;
 import ru.tsystems.javaschool.service.OrderService;
 import ru.tsystems.javaschool.service.WaypointService;
@@ -27,6 +27,20 @@ public class OrderServiceImpl implements OrderService {
     private TruckDao truckDao;
 
     private WaypointService waypointService;
+
+    private CargoDao cargoDao;
+
+    private WaypointDao waypointDao;
+
+    @Autowired
+    public void setCargoDao(CargoDao cargoDao) {
+        this.cargoDao = cargoDao;
+    }
+
+    @Autowired
+    public void setWaypointDao(WaypointDao waypointDao) {
+        this.waypointDao = waypointDao;
+    }
 
     @Autowired
     public void setWaypointService(WaypointService waypointService) {
@@ -60,6 +74,7 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     public void deleteOrder(Integer id) {
+        removeTruckAndDriversFromOrder(findOrderById(id));
         orderDao.deleteOrder(id);
     }
 
@@ -86,18 +101,25 @@ public class OrderServiceImpl implements OrderService {
     @Override
     public Double calculateSumDistanceOfOrder(Order order) {
         List<Waypoint> waypoints = waypointService.findAllWaypointsByOrderId(order.getId());
+        List<Waypoint> waypointsWithNotDeliveredCargoes = new ArrayList<>();
+        for (Waypoint wp: waypoints
+                ) {
+            if (!wp.getCargo().getDelivery_status().equals(CargoStatus.DELIVERED)){
+                waypointsWithNotDeliveredCargoes.add(wp);
+            }
+        }
         Double sumDistance = 0d;
         City cityA;
 
         List<City> cities = new ArrayList<>();
-        for (Waypoint waypoint: waypoints
+        for (Waypoint waypoint: waypointsWithNotDeliveredCargoes
              ) {
             cities.add(waypoint.getCityDep());
             cities.add(waypoint.getCityDest());
         }
         cityA = cities.get(0);
         for (int i = 1; i < cities.size(); i++) {
-            sumDistance += cityService.distanceBetweenTwoCity(cityA, cities.get(i));
+            sumDistance += cityService.distanceBetweenTwoCities(cityA, cities.get(i));
             cityA = cities.get(i);
         }
         return sumDistance;
@@ -115,25 +137,37 @@ public class OrderServiceImpl implements OrderService {
         Double averageTimeOfDrivingInHours = calculateSumDistanceOfOrder(order)/averageTruckSpeedInKmPerHour;
         int averageTimeOfProcessingInHours = 2;
         List<Waypoint> waypoints = waypointService.findAllWaypointsByOrderId(order.getId());
-        return waypoints.size()*averageTimeOfProcessingInHours
+        List<Waypoint> waypointsWithNotDeliveredCargoes = new ArrayList<>();
+        for (Waypoint wp: waypoints
+             ) {
+            if (!wp.getCargo().getDelivery_status().equals(CargoStatus.DELIVERED)){
+                waypointsWithNotDeliveredCargoes.add(wp);
+            }
+        }
+        return waypointsWithNotDeliveredCargoes.size()*averageTimeOfProcessingInHours
                 +(int)Math.round(averageTimeOfDrivingInHours);
 
     }
 
     @Override
     public void removeTruckAndDriversFromOrder(Order order) {
-        Truck truck = order.getTruck();
+        Order entityOrder = orderDao.findOrderById(order.getId());
+        Truck truck = entityOrder.getTruck();
         if (truck!=null){
             List<Driver> drivers = driverDao.getAllDriversOfTruck(truck);
             if(drivers != null){
                 for (Driver driver: drivers
                      ) {
                     driver.setCurrentTruck(null);
+                    driver.setOrder(null);
+                    driver.setStatus(DriverStatus.REST);
                     driverDao.updateDriver(driver);
                 }
             }
             truck.setOrder(null);
             truckDao.updateTruck(truck);
+            entityOrder.setTruck(null);
+            orderDao.updateOrder(entityOrder);
         }
     }
 }

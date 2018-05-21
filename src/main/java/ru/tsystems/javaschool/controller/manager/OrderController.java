@@ -18,7 +18,7 @@ import java.util.List;
 public class OrderController {
 
     private static final String ORDER_LIST_VIEW_PATH = "redirect:/manager/listOrders";
-    private static final String ADD_ORDER_VIEW_PATH = "neworder";
+    private static final String ADD_ORDER_VIEW_PATH = "allcargoes";
 
     @Autowired
     OrderService orderService;
@@ -55,7 +55,13 @@ public class OrderController {
 
     @GetMapping(path = "manager/{orderId}/listOrderCargoes")
     public String listCargoes(@PathVariable Integer orderId, Model model){
-        model.addAttribute("order", orderService.findOrderById(orderId));
+        Order order = orderService.findOrderById(orderId);
+        Truck truck = null;
+        if(order.getTruck()!=null){
+            truck = truckService.findTruckById(order.getTruck().getId());
+        }
+        model.addAttribute("order", order);
+        model.addAttribute("truck", truck);
         model.addAttribute("cargoes", cargoService.findAllCargoesOfOrder(orderId));
         return ADD_ORDER_VIEW_PATH;
     }
@@ -89,11 +95,12 @@ public class OrderController {
 
     @GetMapping(path = "manager/{id}/setOrderTruck")
     public String setTruckToOrder(@PathVariable Integer id, Model model){
+        Order order = orderService.findOrderById(id);
         if(cargoService.findAllCargoesOfOrder(id)==null ||
-                orderService.findOrderById(id).getOrderStatus() != OrderStatus.CREATED){
+                ((order.getOrderStatus() != OrderStatus.CREATED)
+                && (order.getOrderStatus() != OrderStatus.INTERRUPTED))){
             return ORDER_LIST_VIEW_PATH;
         }
-        Order order = orderService.findOrderById(id);
         orderService.removeTruckAndDriversFromOrder(order);
         model.addAttribute("order", order);
         model.addAttribute("trucks",
@@ -114,11 +121,13 @@ public class OrderController {
 
     @GetMapping(path = "manager/{id}/setOrderDrivers")
     public String setDriversToOrder(@PathVariable Integer id, Model model){
-        if(orderService.findOrderById(id).getTruck()==null ||
-                orderService.findOrderById(id).getOrderStatus() != OrderStatus.CREATED){
+        Order order = orderService.findOrderById(id);
+        if(cargoService.findAllCargoesOfOrder(id)==null ||
+                order.getTruck()==null ||
+                ((order.getOrderStatus() != OrderStatus.CREATED)
+                        && (order.getOrderStatus() != OrderStatus.INTERRUPTED))){
             return ORDER_LIST_VIEW_PATH;
         }
-        Order order = orderService.findOrderById(id);
         List<Driver> orderDrivers = driverService.getAllDriversOfOrder(order);
         model.addAttribute("order", order);
         model.addAttribute("driver", new Driver());
@@ -139,25 +148,16 @@ public class OrderController {
 
     @GetMapping(path = "manager/{id}/complete")
     public String completeOrderCreation(@PathVariable Integer id, Model model){
+        Order order = orderService.findOrderById(id);
         if(cargoService.findAllCargoesOfOrder(id)==null||
                 orderService.findOrderById(id).getTruck()==null ||
                 driverService.getAllDriversOfOrder(orderService.findOrderById(id))==null ||
-                orderService.findOrderById(id).getOrderStatus() != OrderStatus.CREATED){
+                ((order.getOrderStatus() != OrderStatus.CREATED)
+                        && (order.getOrderStatus() != OrderStatus.INTERRUPTED))){
             return ORDER_LIST_VIEW_PATH;
         }
-        Order order = orderService.findOrderById(id);
         order.setOrderStatus(OrderStatus.IN_PROCESS);
         orderService.updateOrder(order);
-        return ORDER_LIST_VIEW_PATH;
-    }
-
-    @GetMapping(path = "manager/{id}/cancel")
-    public String cancelOrderCreation(@PathVariable Integer id, Model model){
-        if(orderService.findOrderById(id).getOrderStatus() != OrderStatus.CREATED){
-            return ORDER_LIST_VIEW_PATH;
-        }
-        orderService.removeTruckAndDriversFromOrder(orderService.findOrderById(id));
-        orderService.deleteOrder(id);
         return ORDER_LIST_VIEW_PATH;
     }
 

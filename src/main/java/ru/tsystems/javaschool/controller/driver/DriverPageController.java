@@ -12,14 +12,10 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
-import ru.tsystems.javaschool.model.Driver;
-import ru.tsystems.javaschool.model.Truck;
-import ru.tsystems.javaschool.model.User;
-import ru.tsystems.javaschool.model.Waypoint;
+import ru.tsystems.javaschool.model.*;
+import ru.tsystems.javaschool.model.enums.CargoStatus;
 import ru.tsystems.javaschool.model.enums.DriverStatus;
-import ru.tsystems.javaschool.service.DriverService;
-import ru.tsystems.javaschool.service.UserService;
-import ru.tsystems.javaschool.service.WaypointService;
+import ru.tsystems.javaschool.service.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -34,6 +30,27 @@ public class DriverPageController {
     private UserService userService;
 
     private WaypointService waypointService;
+
+    private TruckService truckService;
+
+    private CargoService cargoService;
+
+    private CityService cityService;
+
+    @Autowired
+    public void setCityService(CityService cityService) {
+        this.cityService = cityService;
+    }
+
+    @Autowired
+    public void setCargoService(CargoService cargoService) {
+        this.cargoService = cargoService;
+    }
+
+    @Autowired
+    public void setTruckService(TruckService truckService) {
+        this.truckService = truckService;
+    }
 
     @Autowired
     public void setWaypointService(WaypointService waypointService) {
@@ -55,12 +72,13 @@ public class DriverPageController {
         User user = userService.findByLogin(getPrincipal());
         model.addAttribute("user", getPrincipal());
         Driver driver =  driverService.findDriverById(user.getId());
-        Truck truck = driver.getCurrentTruck();
+        Truck truck = null;
         List<Driver> drivers = new ArrayList<>();
-        if(truck!=null){
+        List<Waypoint> waypoints = new ArrayList<>();
+        if(driver.getCurrentTruck()!=null){
+            truck  = truckService.findTruckById(driver.getCurrentTruck().getId());
             drivers = driverService.findCoWorkers(driver);
         }
-        List<Waypoint> waypoints = new ArrayList<>();
         if(driver.getOrder()!= null){
             waypoints = waypointService.findAllWaypointsByOrderId(driver.getOrder().getId());
         }
@@ -85,6 +103,35 @@ public class DriverPageController {
         return "redirect:/driver";
     }
 
+    @GetMapping(path = "driver/{id}/loaded")
+    public String loadCargo(@PathVariable Integer id, Cargo cargo, Model model){
+        cargoService.setCargoStatus(cargoService.findCargoById(id), CargoStatus.SHIPPED);
+        return "redirect:/driver";
+    }
+
+    @GetMapping(path = "driver/{id}/unloaded")
+    public String unloadCargo(@PathVariable Integer id, Cargo cargo, Model model){
+        String result =
+                cargoService.setCargoStatus(cargoService.findCargoById(id), CargoStatus.DELIVERED);
+        if(result.equals("done")){
+            return "redirect:/driver/orderisdone";
+        }
+        return "redirect:/driver";
+    }
+
+    @GetMapping(path = "driver/orderisdone")
+    public String showOrderIsDonSuccessPage(Model model){
+            model.addAttribute("message", "Order is successfully done!" +
+                    "\n Thank you!");
+        return "orderisdone";
+    }
+
+    @GetMapping(path = "driver/{id}/truckIsBroken")
+    public String truckIsBroken(@PathVariable Integer id, Model model){
+        truckService.markTruckAsBrokenWhileOrder(driverService.findDriverById(id).getCurrentTruck().getId());
+        return "redirect:/driver";
+    }
+
     private String getPrincipal(){
         String userName = null;
         Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
@@ -95,6 +142,11 @@ public class DriverPageController {
             userName = principal.toString();
         }
         return userName;
+    }
+
+    @ModelAttribute("cities")
+    public List<City> cityList(){
+        return cityService.findAllCities();
     }
 
     @ModelAttribute("driverStatuses")
