@@ -46,6 +46,7 @@
                         <td></td>
                         <td></td>
                         <td></td>
+                        <td></td>
                         <td>${driver.status}</td>
                     </c:otherwise>
                 </c:choose>

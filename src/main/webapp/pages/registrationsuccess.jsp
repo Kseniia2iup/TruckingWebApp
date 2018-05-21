@@ -19,9 +19,12 @@
 		<li><a href="<c:url value="/logout" />">Logout</a></li>
 	</ul>
 </div>
-<div class="generic-container">
+
+<div class="container">
+	<div class="success">
 	<div class="alert alert-success lead">
 		${success}
+	</div>
 	</div>
 </div>
 <script>

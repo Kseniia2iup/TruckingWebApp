@@ -1,20 +1,21 @@
 package ru.tsystems.javaschool.service;
 
+import ru.tsystems.javaschool.exceptions.TruckingServiceException;
 import ru.tsystems.javaschool.model.Waypoint;
 
 import java.util.List;
 
 public interface WaypointService {
 
-    Waypoint findWaypointById(Integer id);
+    Waypoint findWaypointById(Integer id) throws TruckingServiceException;
 
-    void deleteWaypoint(Integer id);
+    void deleteWaypoint(Integer id) throws TruckingServiceException;
 
-    void saveWaypoint(Waypoint waypoint);
+    void saveWaypoint(Waypoint waypoint) throws TruckingServiceException;
 
-    void updateWaypoint(Waypoint waypoint);
+    void updateWaypoint(Waypoint waypoint) throws TruckingServiceException;
 
-    List<Waypoint> findAllWaypointsByOrderId(Integer orderId);
+    List<Waypoint> findAllWaypointsByOrderId(Integer orderId) throws TruckingServiceException;
 
-    List<Waypoint> findAllWaypointsByCargoId(Integer cargoId);
+    List<Waypoint> findAllWaypointsByCargoId(Integer cargoId) throws TruckingServiceException;
 }

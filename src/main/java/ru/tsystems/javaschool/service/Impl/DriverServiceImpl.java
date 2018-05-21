@@ -5,6 +5,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import ru.tsystems.javaschool.exceptions.TruckingServiceException;
 import ru.tsystems.javaschool.model.Driver;
 import ru.tsystems.javaschool.model.Order;
 import ru.tsystems.javaschool.model.OrderHistory;
@@ -27,7 +28,7 @@ import java.util.Random;
 @Transactional
 public class DriverServiceImpl implements DriverService {
 
-    private static final Logger LOG = LoggerFactory.getLogger(DriverServiceImpl.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(DriverServiceImpl.class);
 
     private UserService userService;
 
@@ -59,33 +60,69 @@ public class DriverServiceImpl implements DriverService {
 
 
     @Override
-    public Driver findDriverById(Integer id) {
-        return driverDao.findDriverById(id);
+    public Driver findDriverById(Integer id) throws TruckingServiceException {
+        try {
+            return driverDao.findDriverById(id);
+        }
+        catch (Exception e){
+            LOGGER.warn("Something went wrong\n", e);
+            throw new TruckingServiceException(e);
+        }
     }
 
     @Override
-    public void deleteDriver(Integer id) {
-        driverDao.deleteDriver(id);
+    public void deleteDriver(Integer id) throws TruckingServiceException {
+        try {
+            driverDao.deleteDriver(id);
+        }
+        catch (Exception e){
+            LOGGER.warn("Something went wrong\n", e);
+            throw new TruckingServiceException(e);
+        }
     }
 
     @Override
-    public void saveDriver(Driver driver) {
-        driverDao.saveDriver(driver);
+    public void saveDriver(Driver driver) throws TruckingServiceException {
+        try {
+            driverDao.saveDriver(driver);
+        }
+        catch (Exception e){
+            LOGGER.warn("Something went wrong\n", e);
+            throw new TruckingServiceException(e);
+        }
     }
 
     @Override
-    public void updateDriver(Driver driver) {
-        driverDao.updateDriver(driver);
+    public void updateDriver(Driver driver) throws TruckingServiceException {
+        try {
+            driverDao.updateDriver(driver);
+        }
+        catch (Exception e){
+            LOGGER.warn("Something went wrong\n", e);
+            throw new TruckingServiceException(e);
+        }
     }
 
     @Override
-    public List<Driver> findAllDrivers() {
-        return driverDao.findAllDrivers();
+    public List<Driver> findAllDrivers() throws TruckingServiceException {
+        try {
+            return driverDao.findAllDrivers();
+        }
+        catch (Exception e){
+            LOGGER.warn("Something went wrong\n", e);
+            throw new TruckingServiceException(e);
+        }
     }
 
     @Override
-    public Integer getLastDriverId() {
-        return driverDao.getLastDriverId();
+    public Integer getLastDriverId() throws TruckingServiceException {
+        try {
+            return driverDao.getLastDriverId();
+        }
+        catch (Exception e){
+            LOGGER.warn("Something went wrong\n", e);
+            throw new TruckingServiceException(e);
+        }
     }
 
     /**
@@ -94,23 +131,29 @@ public class DriverServiceImpl implements DriverService {
      * @return random login
      */
     @Override
-    public String generateDriverLogin(Driver driver) {
-        Random random = new Random();
-        Integer lastDriverId = getLastDriverId();
-        if (lastDriverId == null){
-            lastDriverId = 1;
+    public String generateDriverLogin(Driver driver) throws TruckingServiceException {
+        try {
+            Random random = new Random();
+            Integer lastDriverId = getLastDriverId();
+            if (lastDriverId == null) {
+                lastDriverId = 1;
+            }
+            String result = driver.getName()
+                    + '_'
+                    + lastDriverId
+                    + random.nextInt(1000);
+            while (!userService.isUserLoginUnique(result)) {
+                StringBuilder stringBuilder = new StringBuilder(result);
+                stringBuilder.append(random.nextInt(9));
+                result = stringBuilder.toString();
+            }
+            //System.out.println("------------" + result + "------------");
+            return result;
         }
-        String result = driver.getName()
-                +'_'
-                +lastDriverId
-                +random.nextInt(1000);
-        while (!userService.isUserLoginUnique(result)){
-            StringBuilder stringBuilder = new StringBuilder(result);
-            stringBuilder.append(random.nextInt(9));
-            result = stringBuilder.toString();
+        catch (Exception e){
+            LOGGER.warn("Something went wrong\n", e);
+            throw new TruckingServiceException(e);
         }
-        //System.out.println("------------" + result + "------------");
-        return result;
     }
 
     /**
@@ -138,7 +181,7 @@ public class DriverServiceImpl implements DriverService {
      * @return List of Drivers suitable for the order execution
      */
     @Override
-    public List<Driver> findAllDriversSuitableForOrder(Order order) {
+    public List<Driver> findAllDriversSuitableForOrder(Order order) throws TruckingServiceException {
         try {
             List<Driver> drivers = driverDao.getAllFreeDriversForTruck(order.getTruck());
             List<Driver> result = new ArrayList<>();
@@ -152,19 +195,31 @@ public class DriverServiceImpl implements DriverService {
             return result;
         }
         catch (Exception e){
-            LOG.debug("From DriverServiceImpl method findAllDriversSuitableForOrder:\n", e);
-            throw e;
+            LOGGER.debug("From DriverServiceImpl method findAllDriversSuitableForOrder:\n", e);
+            throw new TruckingServiceException(e);
         }
     }
 
     @Override
-    public List<Driver> getAllDriversOfTruck(Truck truck) {
-        return driverDao.getAllDriversOfTruck(truck);
+    public List<Driver> getAllDriversOfTruck(Truck truck) throws TruckingServiceException {
+        try {
+            return driverDao.getAllDriversOfTruck(truck);
+        }
+        catch (Exception e){
+            LOGGER.warn("Something went wrong\n", e);
+            throw new TruckingServiceException(e);
+        }
     }
 
     @Override
-    public List<Driver> getAllDriversOfOrder(Order order) {
-        return driverDao.getAllDriversOfOrder(order);
+    public List<Driver> getAllDriversOfOrder(Order order) throws TruckingServiceException {
+        try {
+            return driverDao.getAllDriversOfOrder(order);
+        }
+        catch (Exception e){
+            LOGGER.warn("Something went wrong\n", e);
+            throw new TruckingServiceException(e);
+        }
     }
 
     /**
@@ -173,22 +228,28 @@ public class DriverServiceImpl implements DriverService {
      * @return List of Drivers with the same Order that driver has
      */
     @Override
-    public List<Driver> findCoWorkers(Driver driver) {
-        if(driver.getOrder()!=null) {
-            List<Driver> drivers = getAllDriversOfOrder(driver.getOrder());
-            int index=-1;
-            for (Driver dr: drivers
-                 ) {
-                if(dr.getId()==driver.getId()){
-                    index = drivers.indexOf(dr);
+    public List<Driver> findCoWorkers(Driver driver) throws TruckingServiceException {
+        try {
+            if (driver.getOrder() != null) {
+                List<Driver> drivers = getAllDriversOfOrder(driver.getOrder());
+                int index = -1;
+                for (Driver dr : drivers
+                        ) {
+                    if (dr.getId() == driver.getId()) {
+                        index = drivers.indexOf(dr);
+                    }
                 }
+                if (index != -1) {
+                    drivers.remove(index);
+                }
+                return drivers;
             }
-            if(index!=-1){
-                drivers.remove(index);
-            }
-            return drivers;
+            return null;
         }
-        return null;
+        catch (Exception e){
+            LOGGER.warn("Something went wrong\n", e);
+            throw new TruckingServiceException(e);
+        }
     }
 
     /**
@@ -201,52 +262,55 @@ public class DriverServiceImpl implements DriverService {
      * @param newStatus new status to the Driver
      */
     @Override
-    public void setDriverStatus(Driver driver, DriverStatus newStatus) {
-        DriverStatus oldStatus = driver.getStatus();
-        OrderHistory history;
+    public void setDriverStatus(Driver driver, DriverStatus newStatus) throws TruckingServiceException {
+        try {
+            DriverStatus oldStatus = driver.getStatus();
+            OrderHistory history;
 
-        if (driver.getHistory()!=null){
-            history = driver.getHistory();
-            orderHistoryService.updateHistory(history);
-        }
-        else {
-            history = new OrderHistory();
-            history.setDriver(driver);
-            orderHistoryService.saveHistory(history);
-        }
-
-        if(oldStatus.equals(DriverStatus.REST) && !newStatus.equals(DriverStatus.REST)){
-            history.setShiftBegined(new Date(System.currentTimeMillis()));
-            orderHistoryService.updateHistory(history);
-
-            driver.setStatus(newStatus);
-            updateDriver(driver);
-        }
-
-        //If Driver has ended shift add new hours of work to workedThisMonth field
-        else if (!oldStatus.equals(DriverStatus.REST) && newStatus.equals(DriverStatus.REST)){
-            history.setShiftEnded(new Date(System.currentTimeMillis()));
-            orderHistoryService.updateHistory(history);
-
-            LocalDateTime shiftBegan = LocalDateTime.ofInstant(
-                    history.getShiftBegined().toInstant(), ZoneId.systemDefault());
-            LocalDateTime shiftEnded = LocalDateTime.ofInstant(
-                    history.getShiftEnded().toInstant(), ZoneId.systemDefault());
-
-            if (shiftBegan.getMonthValue() != shiftEnded.getMonthValue()){
-                driver.setWorkedThisMonth(shiftEnded.getDayOfMonth()*24 + shiftEnded.getHour());
-            }
-            else {
-                driver.setWorkedThisMonth((shiftEnded.getDayOfMonth()-shiftBegan.getDayOfMonth())
-                        *24 + shiftEnded.getHour() - shiftBegan.getHour());
+            if (driver.getHistory() != null) {
+                history = driver.getHistory();
+                orderHistoryService.updateHistory(history);
+            } else {
+                history = new OrderHistory();
+                history.setDriver(driver);
+                orderHistoryService.saveHistory(history);
             }
 
-            driver.setStatus(newStatus);
-            updateDriver(driver);
+            if (oldStatus.equals(DriverStatus.REST) && !newStatus.equals(DriverStatus.REST)) {
+                history.setShiftBegined(new Date(System.currentTimeMillis()));
+                orderHistoryService.updateHistory(history);
+
+                driver.setStatus(newStatus);
+                updateDriver(driver);
+            }
+
+            //If Driver has ended shift add new hours of work to workedThisMonth field
+            else if (!oldStatus.equals(DriverStatus.REST) && newStatus.equals(DriverStatus.REST)) {
+                history.setShiftEnded(new Date(System.currentTimeMillis()));
+                orderHistoryService.updateHistory(history);
+
+                LocalDateTime shiftBegan = LocalDateTime.ofInstant(
+                        history.getShiftBegined().toInstant(), ZoneId.systemDefault());
+                LocalDateTime shiftEnded = LocalDateTime.ofInstant(
+                        history.getShiftEnded().toInstant(), ZoneId.systemDefault());
+
+                if (shiftBegan.getMonthValue() != shiftEnded.getMonthValue()) {
+                    driver.setWorkedThisMonth(shiftEnded.getDayOfMonth() * 24 + shiftEnded.getHour());
+                } else {
+                    driver.setWorkedThisMonth((shiftEnded.getDayOfMonth() - shiftBegan.getDayOfMonth())
+                            * 24 + shiftEnded.getHour() - shiftBegan.getHour());
+                }
+
+                driver.setStatus(newStatus);
+                updateDriver(driver);
+            } else {
+                driver.setStatus(newStatus);
+                updateDriver(driver);
+            }
         }
-        else {
-            driver.setStatus(newStatus);
-            updateDriver(driver);
+        catch (Exception e){
+            LOGGER.warn("Something went wrong\n", e);
+            throw new TruckingServiceException(e);
         }
     }
 }

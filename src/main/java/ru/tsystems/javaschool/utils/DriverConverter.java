@@ -28,10 +28,16 @@ public class DriverConverter implements Converter<Object, Driver> {
             LOG.debug("From DriverConverter convert method\nProfile : {}", driver);
         }
         catch (Exception e){
-            LOG.debug("From DriverConverter convert method\nProfile : {}", e);
-            Integer id = Integer.parseInt((String) source);
-            driver = driverService.findDriverById(id);
-            LOG.debug("From DriverConverter convert method\nProfile : {}", driver);
+            try {
+                LOG.debug("From DriverConverter convert method\nProfile : {}", e);
+                Integer id = Integer.parseInt((String) source);
+                driver = driverService.findDriverById(id);
+                LOG.debug("From DriverConverter convert method\nProfile : {}", driver);
+            }
+            catch (Exception ex){
+                LOG.debug("From DriverConverter convert method\nProfile : {}", ex);
+                driver = null;
+            }
         }
         return driver;
     }

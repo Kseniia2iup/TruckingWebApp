@@ -1,5 +1,6 @@
 package ru.tsystems.javaschool.repository;
 
+import ru.tsystems.javaschool.exceptions.TruckingDaoException;
 import ru.tsystems.javaschool.model.Order;
 import ru.tsystems.javaschool.model.Truck;
 
@@ -7,17 +8,17 @@ import java.util.List;
 
 public interface TruckDao {
 
-    Truck findTruckById(int id);
+    Truck findTruckById(int id) throws TruckingDaoException;
 
-    Truck findTruckByRegNumber(String regNumber);
+    Truck findTruckByRegNumber(String regNumber) throws TruckingDaoException;
 
-    void saveTruck(Truck truck);
+    void saveTruck(Truck truck) throws TruckingDaoException;
 
-    void updateTruck(Truck truck);
+    void updateTruck(Truck truck) throws TruckingDaoException;
 
-    void deleteTruckByRegNumber(String regNumber);
+    void deleteTruckByRegNumber(String regNumber) throws TruckingDaoException;
 
-    List<Truck> findAllTrucks();
+    List<Truck> findAllTrucks() throws TruckingDaoException;
 
-    List<Truck> findAllOKTrucks();
+    List<Truck> findAllOKTrucks() throws TruckingDaoException;
 }

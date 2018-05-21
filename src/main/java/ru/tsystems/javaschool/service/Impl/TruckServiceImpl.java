@@ -1,8 +1,12 @@
 package ru.tsystems.javaschool.service.Impl;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import ru.tsystems.javaschool.exceptions.NoCargoInTheOrderException;
+import ru.tsystems.javaschool.exceptions.TruckingServiceException;
 import ru.tsystems.javaschool.model.Cargo;
 import ru.tsystems.javaschool.model.Order;
 import ru.tsystems.javaschool.model.Truck;
@@ -23,6 +27,8 @@ import java.util.regex.Pattern;
 @Service("truckService")
 @Transactional
 public class TruckServiceImpl implements TruckService {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(TruckServiceImpl.class);
 
     private TruckDao truckDao;
 
@@ -53,39 +59,81 @@ public class TruckServiceImpl implements TruckService {
     }
 
     @Override
-    public Truck findTruckById(int id) {
-        return truckDao.findTruckById(id);
+    public Truck findTruckById(int id) throws TruckingServiceException {
+        try {
+            return truckDao.findTruckById(id);
+        }
+        catch (Exception e){
+            LOGGER.warn("Something went wrong\n", e);
+            throw new TruckingServiceException(e);
+        }
     }
 
     @Override
-    public Truck findTruckByRegNumber(String regNumber) {
-        return truckDao.findTruckByRegNumber(regNumber);
+    public Truck findTruckByRegNumber(String regNumber) throws TruckingServiceException {
+        try {
+            return truckDao.findTruckByRegNumber(regNumber);
+        }
+        catch (Exception e){
+            LOGGER.warn("Something went wrong\n", e);
+            throw new TruckingServiceException(e);
+        }
     }
 
     @Override
-    public void saveTruck(Truck truck) {
-        truckDao.saveTruck(truck);
+    public void saveTruck(Truck truck) throws TruckingServiceException {
+        try {
+            truckDao.saveTruck(truck);
+        }
+        catch (Exception e){
+            LOGGER.warn("Something went wrong\n", e);
+            throw new TruckingServiceException(e);
+        }
     }
 
     @Override
-    public void deleteTruckByRegNumber(String regNumber) {
-        truckDao.deleteTruckByRegNumber(regNumber);
+    public void deleteTruckByRegNumber(String regNumber) throws TruckingServiceException {
+        try {
+            truckDao.deleteTruckByRegNumber(regNumber);
+        }
+        catch (Exception e){
+            LOGGER.warn("Something went wrong\n", e);
+            throw new TruckingServiceException(e);
+        }
     }
 
     @Override
-    public List<Truck> findAllTrucks() {
-        return truckDao.findAllTrucks();
+    public List<Truck> findAllTrucks() throws TruckingServiceException {
+        try {
+            return truckDao.findAllTrucks();
+        }
+        catch (Exception e){
+            LOGGER.warn("Something went wrong\n", e);
+            throw new TruckingServiceException(e);
+        }
     }
 
     @Override
-    public void updateTruck(Truck truck) {
-        truckDao.updateTruck(truck);
+    public void updateTruck(Truck truck) throws TruckingServiceException {
+        try {
+            truckDao.updateTruck(truck);
+        }
+        catch (Exception e){
+            LOGGER.warn("Something went wrong\n", e);
+            throw new TruckingServiceException(e);
+        }
     }
 
     @Override
-    public boolean isTruckRegNumberUnique(Integer id, String regNumber) {
-        Truck truck = findTruckByRegNumber(regNumber);
-        return (truck == null || ((id!=null) && (truck.getId() == id)));
+    public boolean isTruckRegNumberUnique(Integer id, String regNumber) throws TruckingServiceException {
+        try {
+            Truck truck = findTruckByRegNumber(regNumber);
+            return (truck == null || ((id != null) && (truck.getId() == id)));
+        }
+        catch (Exception e){
+            LOGGER.warn("Something went wrong\n", e);
+            throw new TruckingServiceException(e);
+        }
     }
 
     @Override
@@ -101,28 +149,36 @@ public class TruckServiceImpl implements TruckService {
      * @return List of Trucks suitable for the order
      */
     @Override
-    public List<Truck> findAllTrucksReadyForOrder(Order order) {
-        List<Cargo> cargoes = cargoDao.findAllCargoesOfOrder(order.getId());
-        int cargoMaxWeightKg = 0;
-        if(cargoes!=null) {
+    public List<Truck> findAllTrucksReadyForOrder(Order order)
+            throws TruckingServiceException, NoCargoInTheOrderException {
+        try {
+            List<Cargo> cargoes = cargoDao.findAllCargoesOfOrder(order.getId());
+            if ((cargoes == null)||cargoes.isEmpty()){
+                throw new NoCargoInTheOrderException("No cargoes in the order " + order.getId());
+            }
+            int cargoMaxWeightKg = 0;
             for (Cargo cargo : cargoes
                     ) {
-                if (!cargo.getDelivery_status().equals(CargoStatus.DELIVERED)&&
+                if (!cargo.getDelivery_status().equals(CargoStatus.DELIVERED) &&
                         (cargo.getWeight() > cargoMaxWeightKg)) {
                     cargoMaxWeightKg = cargo.getWeight();
                 }
             }
-        }
-        double maxWeightTon = cargoMaxWeightKg/1000d;
-        List<Truck> result = new ArrayList<>();
-        List<Truck> trucks = truckDao.findAllOKTrucks();
-        for (Truck truck: trucks
-             ) {
-            if(!orderDao.isTruckHasOrder(truck.getId()) && ((double)truck.getCapacityTon() >= maxWeightTon)){
-                result.add(truck);
+            double maxWeightTon = cargoMaxWeightKg / 1000d;
+            List<Truck> result = new ArrayList<>();
+            List<Truck> trucks = truckDao.findAllOKTrucks();
+            for (Truck truck : trucks
+                    ) {
+                if (!orderDao.isTruckHasOrder(truck.getId()) && ((double) truck.getCapacityTon() >= maxWeightTon)) {
+                    result.add(truck);
+                }
             }
+            return result;
         }
-        return result;
+        catch (Exception e){
+            LOGGER.warn("Something went wrong\n", e);
+            throw new TruckingServiceException(e);
+        }
     }
 
     /**
@@ -132,24 +188,30 @@ public class TruckServiceImpl implements TruckService {
      * @param id of Truck that was broken
      */
     @Override
-    public void markTruckAsBrokenWhileOrder(Integer id) {
-        Truck entityTruck = truckDao.findTruckById(id);
-        Order order = entityTruck.getOrder();
-        List<Cargo> cargoes = cargoDao.findAllCargoesOfOrder(order.getId());
-        for (Cargo cargo: cargoes
-             ) {
-            if(cargo.getDelivery_status().equals(CargoStatus.SHIPPED)) {
-                cargo.setDelivery_status(CargoStatus.PREPARED);
-                cargo.getWaypoint().setCityDep(entityTruck.getCity());
-                cargoDao.updateCargo(cargo);
+    public void markTruckAsBrokenWhileOrder(Integer id)  throws TruckingServiceException{
+        try {
+            Truck entityTruck = truckDao.findTruckById(id);
+            Order order = entityTruck.getOrder();
+            List<Cargo> cargoes = cargoDao.findAllCargoesOfOrder(order.getId());
+            for (Cargo cargo : cargoes
+                    ) {
+                if (cargo.getDelivery_status().equals(CargoStatus.SHIPPED)) {
+                    cargo.setDelivery_status(CargoStatus.PREPARED);
+                    cargo.getWaypoint().setCityDep(entityTruck.getCity());
+                    cargoDao.updateCargo(cargo);
+                }
             }
+
+            orderService.removeTruckAndDriversFromOrder(order);
+            order.setOrderStatus(OrderStatus.INTERRUPTED);
+            orderService.updateOrder(order);
+
+            entityTruck.setCondition(TruckStatus.FAULTY);
+            truckDao.updateTruck(entityTruck);
         }
-
-        orderService.removeTruckAndDriversFromOrder(order);
-        order.setOrderStatus(OrderStatus.INTERRUPTED);
-        orderService.updateOrder(order);
-
-        entityTruck.setCondition(TruckStatus.FAULTY);
-        truckDao.updateTruck(entityTruck);
+        catch (Exception e){
+            LOGGER.warn("Something went wrong\n", e);
+            throw new TruckingServiceException(e);
+        }
     }
 }

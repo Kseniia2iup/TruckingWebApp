@@ -1,8 +1,12 @@
 package ru.tsystems.javaschool.service.Impl;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import ru.tsystems.javaschool.exceptions.TruckingDaoException;
+import ru.tsystems.javaschool.exceptions.TruckingServiceException;
 import ru.tsystems.javaschool.model.City;
 import ru.tsystems.javaschool.repository.CityDao;
 import ru.tsystems.javaschool.service.CityService;
@@ -12,6 +16,8 @@ import java.util.List;
 @Service("cityService")
 @Transactional
 public class CityServiceImpl implements CityService {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(CityServiceImpl.class);
 
     private static final Double EARTH_RADIUS = 6371d;
 
@@ -23,18 +29,36 @@ public class CityServiceImpl implements CityService {
     }
 
     @Override
-    public City findCityById(int id) {
-        return cityDao.findCityById(id);
+    public City findCityById(int id) throws TruckingServiceException {
+        try {
+            return cityDao.findCityById(id);
+        }
+        catch (Exception e){
+            LOGGER.warn("Something went wrong\n", e);
+            throw new TruckingServiceException(e);
+        }
     }
 
     @Override
-    public City findCityByName(String name) {
-        return cityDao.findCityByName(name);
+    public City findCityByName(String name) throws TruckingServiceException {
+        try {
+            return cityDao.findCityByName(name);
+        }
+        catch (Exception e){
+            LOGGER.warn("Something went wrong\n", e);
+            throw new TruckingServiceException(e);
+        }
     }
 
     @Override
-    public List<City> findAllCities() {
-        return cityDao.findAllCities();
+    public List<City> findAllCities() throws TruckingServiceException {
+        try {
+            return cityDao.findAllCities();
+        }
+        catch (Exception e){
+            LOGGER.warn("Something went wrong\n", e);
+            throw new TruckingServiceException(e);
+        }
     }
 
     @Override

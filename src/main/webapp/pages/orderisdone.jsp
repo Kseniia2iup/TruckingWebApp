@@ -24,7 +24,9 @@
 </div>
 <div class="container">
     <div class="success">
-        ${message}
+        <div class="alert alert-success lead">
+            ${message}
+        </div>
     </div>
 </div>
 <script>

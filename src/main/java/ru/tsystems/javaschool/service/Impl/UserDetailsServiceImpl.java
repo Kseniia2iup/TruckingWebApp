@@ -13,13 +13,14 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import ru.tsystems.javaschool.exceptions.TruckingDaoException;
 import ru.tsystems.javaschool.model.User;
 import ru.tsystems.javaschool.service.UserService;
 
 @Service
 public class UserDetailsServiceImpl implements UserDetailsService {
 
-    private static final Logger LOG = LoggerFactory.getLogger(UserDetailsServiceImpl.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(UserDetailsServiceImpl.class);
 
     private UserService userService;
 
@@ -30,21 +31,21 @@ public class UserDetailsServiceImpl implements UserDetailsService {
 
     @Transactional(readOnly=true)
     public UserDetails loadUserByUsername(String login) {
-        User user = userService.findByLogin(login);
-        LOG.info("User : {}", user);
-        if(user==null){
-            LOG.debug("User not found");
-            throw new UsernameNotFoundException("Username not found");
-        }
-        return new org.springframework.security.core.userdetails.User(user.getLogin(), user.getPassword(),
-                true, true, true, true, getGrantedAuthorities(user));
+            User user = userService.findByLogin(login);
+            LOGGER.info("User : {}", user);
+            if (user == null) {
+                LOGGER.debug("User not found");
+                throw new UsernameNotFoundException("Username not found");
+            }
+            return new org.springframework.security.core.userdetails.User(user.getLogin(), user.getPassword(),
+                    true, true, true, true, getGrantedAuthorities(user));
     }
 
 
     private List<GrantedAuthority> getGrantedAuthorities(User user){
         List<GrantedAuthority> authorities = new ArrayList<>();
         authorities.add(new SimpleGrantedAuthority("ROLE_"+user.getRole()));
-        LOG.info("authorities : {} for user : {}",authorities, user.getLogin());
+        LOGGER.info("authorities : {} for user : {}",authorities, user.getLogin());
         return authorities;
     }
 }

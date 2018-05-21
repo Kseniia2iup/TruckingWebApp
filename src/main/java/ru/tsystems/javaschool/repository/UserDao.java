@@ -1,18 +1,19 @@
 package ru.tsystems.javaschool.repository;
 
+import ru.tsystems.javaschool.exceptions.TruckingDaoException;
 import ru.tsystems.javaschool.model.User;
 
 import java.util.List;
 
 public interface UserDao {
 
-    void save(User user);
+    void save(User user) throws TruckingDaoException;
 
-    void delete(Integer id);
+    void delete(Integer id) throws TruckingDaoException;
 
-    User findById(int id);
+    User findById(int id) throws TruckingDaoException;
 
     User findByLogin(String login);
 
-    List<User> findAllUsers();
+    List<User> findAllUsers() throws TruckingDaoException;
 }

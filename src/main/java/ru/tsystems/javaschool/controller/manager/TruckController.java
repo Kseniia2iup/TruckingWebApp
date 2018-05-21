@@ -8,6 +8,7 @@ import org.springframework.ui.ModelMap;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.*;
+import ru.tsystems.javaschool.exceptions.TruckingServiceException;
 import ru.tsystems.javaschool.model.City;
 import ru.tsystems.javaschool.model.Truck;
 import ru.tsystems.javaschool.model.enums.TruckStatus;
@@ -46,14 +47,14 @@ public class TruckController {
     }
 
     @GetMapping(path = {"/manager/listTrucks"})
-    public String listOfTrucks(Model model) {
+    public String listOfTrucks(Model model) throws TruckingServiceException {
         List<Truck> trucks = truckService.findAllTrucks();
         model.addAttribute("trucks", trucks);
         return "alltrucks";
     }
 
     @GetMapping(path = { "manager/delete-{reg_number}-truck" })
-    public String deleteTruck(@PathVariable String reg_number) {
+    public String deleteTruck(@PathVariable String reg_number) throws TruckingServiceException {
         truckService.deleteTruckByRegNumber(reg_number);
         return TRUCK_LIST_VIEW_PATH;
     }
@@ -67,20 +68,20 @@ public class TruckController {
 
     @PostMapping(path = { "manager/newTruck" })
     public String saveTruck(@ModelAttribute Truck truck, BindingResult result,
-                               ModelMap model) {
+                               ModelMap model) throws TruckingServiceException {
 
         if (result.hasErrors()) {
             return ADD_TRUCK_VIEW_PATH;
         }
 
         if(!truckService.isTruckRegNumberUnique(truck.getId(), truck.getRegNumber())){
-            FieldError regNumError = new FieldError("truck","reg_number",messageSource.getMessage("non.unique.reg_number", new String[]{truck.getRegNumber()}, Locale.getDefault()));
+            FieldError regNumError = new FieldError("truck","regNumber",messageSource.getMessage("non.unique.reg_number", new String[]{truck.getRegNumber()}, Locale.getDefault()));
             result.addError(regNumError);
             return ADD_TRUCK_VIEW_PATH;
         }
 
         if (!truckService.isTruckRegNumberIsValid(truck.getId(), truck.getRegNumber())){
-            FieldError regNumError = new FieldError("truck","reg_number",messageSource.getMessage("non.valid.reg_number", new String[]{truck.getRegNumber()}, Locale.getDefault()));
+            FieldError regNumError = new FieldError("truck","regNumber",messageSource.getMessage("non.valid.reg_number", new String[]{truck.getRegNumber()}, Locale.getDefault()));
             result.addError(regNumError);
             return ADD_TRUCK_VIEW_PATH;
         }
@@ -92,7 +93,8 @@ public class TruckController {
     }
 
     @GetMapping(path = { "manager/edit-{id}-truck" })
-    public String editTruck(@PathVariable Integer id, ModelMap model) {
+    public String editTruck(@PathVariable Integer id, ModelMap model)
+            throws TruckingServiceException {
         model.addAttribute("truck", truckService.findTruckById(id));
         model.addAttribute("edit", true);
         return ADD_TRUCK_VIEW_PATH;
@@ -100,7 +102,8 @@ public class TruckController {
 
     @PostMapping(path = { "manager/edit-{id}-truck" })
     public String updateTruck(@Valid Truck truck, BindingResult result,
-                                 ModelMap model, @PathVariable Integer id) {
+                                 ModelMap model, @PathVariable Integer id)
+            throws TruckingServiceException {
 
         if (result.hasErrors()) {
             model.addAttribute("truck", truckService.findTruckById(id));
@@ -109,7 +112,8 @@ public class TruckController {
         }
 
         if(!truckService.isTruckRegNumberUnique(truck.getId(), truck.getRegNumber())){
-            FieldError regNumError = new FieldError("truck","reg_number",messageSource.getMessage("non.unique.reg_number", new String[]{truck.getRegNumber()}, Locale.getDefault()));
+            FieldError regNumError = new FieldError("truck","regNumber",
+                    messageSource.getMessage("non.unique.reg_number", new String[]{truck.getRegNumber()}, Locale.getDefault()));
             result.addError(regNumError);
             model.addAttribute("truck", truckService.findTruckById(id));
             model.addAttribute("edit", true);
@@ -117,7 +121,8 @@ public class TruckController {
         }
 
         if (!truckService.isTruckRegNumberIsValid(truck.getId(), truck.getRegNumber())){
-            FieldError regNumError = new FieldError("truck","reg_number",messageSource.getMessage("non.valid.reg_number", new String[]{truck.getRegNumber()}, Locale.getDefault()));
+            FieldError regNumError = new FieldError("truck","regNumber",
+                    messageSource.getMessage("non.valid.reg_number", new String[]{truck.getRegNumber()}, Locale.getDefault()));
             result.addError(regNumError);
             model.addAttribute("truck", truckService.findTruckById(id));
             model.addAttribute("edit", true);
@@ -131,7 +136,7 @@ public class TruckController {
     }
 
     @ModelAttribute("cities")
-    public List<City> cityList(){
+    public List<City> cityList() throws TruckingServiceException {
         return cityService.findAllCities();
     }
 

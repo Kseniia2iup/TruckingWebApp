@@ -1,5 +1,6 @@
 package ru.tsystems.javaschool.repository;
 
+import ru.tsystems.javaschool.exceptions.TruckingDaoException;
 import ru.tsystems.javaschool.model.Driver;
 import ru.tsystems.javaschool.model.Order;
 import ru.tsystems.javaschool.model.Truck;
@@ -8,21 +9,21 @@ import java.util.List;
 
 public interface DriverDao {
 
-    Driver findDriverById(Integer id);
+    Driver findDriverById(Integer id) throws TruckingDaoException;
 
-    void deleteDriver(Integer id);
+    void deleteDriver(Integer id) throws TruckingDaoException;
 
-    void saveDriver(Driver driver);
+    void saveDriver(Driver driver) throws TruckingDaoException;
 
-    void updateDriver(Driver driver);
+    void updateDriver(Driver driver) throws TruckingDaoException;
 
-    List<Driver> findAllDrivers();
+    List<Driver> findAllDrivers() throws TruckingDaoException;
 
-    Integer getLastDriverId();
+    Integer getLastDriverId() throws TruckingDaoException;
 
-    List<Driver> getAllFreeDriversForTruck(Truck truck);
+    List<Driver> getAllFreeDriversForTruck(Truck truck) throws TruckingDaoException;
 
-    List<Driver> getAllDriversOfTruck(Truck truck);
+    List<Driver> getAllDriversOfTruck(Truck truck) throws TruckingDaoException;
 
-    List<Driver> getAllDriversOfOrder(Order order);
+    List<Driver> getAllDriversOfOrder(Order order) throws TruckingDaoException;
 }

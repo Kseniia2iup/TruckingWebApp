@@ -1,24 +1,25 @@
 package ru.tsystems.javaschool.service;
 
+import ru.tsystems.javaschool.exceptions.TruckingServiceException;
 import ru.tsystems.javaschool.model.User;
 
 import java.util.List;
 
 public interface UserService {
 
-    void save(User user);
+    void save(User user) throws TruckingServiceException;
 
-    void updateUser(User user);
+    void updateUser(User user) throws TruckingServiceException;
 
-    void delete(Integer id);
+    void delete(Integer id) throws TruckingServiceException;
 
-    User findById(int id);
+    User findById(int id) throws TruckingServiceException;
 
     User findByLogin(String login);
 
-    boolean isUserValid(User user);
+    boolean isUserValid(User user) throws TruckingServiceException;
 
-    boolean isUserLoginUnique(String login);
+    boolean isUserLoginUnique(String login) throws TruckingServiceException;
 
-    List<User> findAllUsers();
+    List<User> findAllUsers() throws TruckingServiceException;
 }

@@ -1,5 +1,7 @@
 package ru.tsystems.javaschool.service;
 
+import ru.tsystems.javaschool.exceptions.CargoAlreadyDeliveredException;
+import ru.tsystems.javaschool.exceptions.TruckingServiceException;
 import ru.tsystems.javaschool.model.Cargo;
 import ru.tsystems.javaschool.model.enums.CargoStatus;
 
@@ -7,15 +9,16 @@ import java.util.List;
 
 public interface CargoService {
 
-    Cargo findCargoById(Integer id);
+    Cargo findCargoById(Integer id) throws TruckingServiceException;
 
-    void deleteCargo(Integer id);
+    void deleteCargo(Integer id) throws TruckingServiceException;
 
-    void saveCargo(Cargo cargo);
+    void saveCargo(Cargo cargo) throws TruckingServiceException;
 
-    void updateCargo(Cargo cargo);
+    void updateCargo(Cargo cargo) throws TruckingServiceException;
 
-    List<Cargo> findAllCargoesOfOrder(Integer orderId);
+    List<Cargo> findAllCargoesOfOrder(Integer orderId) throws TruckingServiceException;
 
-    String setCargoStatus(Cargo cargo, CargoStatus newStatus);
+    String setCargoStatus(Cargo cargo, CargoStatus newStatus)
+            throws TruckingServiceException, CargoAlreadyDeliveredException;
 }

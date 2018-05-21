@@ -1,8 +1,12 @@
 package ru.tsystems.javaschool.service.Impl;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import ru.tsystems.javaschool.exceptions.CargoAlreadyDeliveredException;
+import ru.tsystems.javaschool.exceptions.TruckingServiceException;
 import ru.tsystems.javaschool.model.Cargo;
 import ru.tsystems.javaschool.model.City;
 import ru.tsystems.javaschool.model.Order;
@@ -20,6 +24,8 @@ import java.util.List;
 @Service("cargoService")
 @Transactional
 public class CargoServiceImpl implements CargoService {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(CargoServiceImpl.class);
 
     private CargoDao cargoDao;
 
@@ -50,28 +56,58 @@ public class CargoServiceImpl implements CargoService {
     }
 
     @Override
-    public Cargo findCargoById(Integer id) {
-        return cargoDao.findCargoById(id);
+    public Cargo findCargoById(Integer id) throws TruckingServiceException {
+        try {
+            return cargoDao.findCargoById(id);
+        }
+        catch (Exception e){
+            LOGGER.warn("Something went wrong\n", e);
+            throw new TruckingServiceException(e);
+        }
     }
 
     @Override
-    public void deleteCargo(Integer id) {
-        cargoDao.deleteCargo(id);
+    public void deleteCargo(Integer id) throws TruckingServiceException {
+        try {
+            cargoDao.deleteCargo(id);
+        }
+        catch (Exception e){
+            LOGGER.warn("Something went wrong\n", e);
+            throw new TruckingServiceException(e);
+        }
     }
 
     @Override
-    public void saveCargo(Cargo cargo) {
-        cargoDao.saveCargo(cargo);
+    public void saveCargo(Cargo cargo) throws TruckingServiceException {
+        try {
+            cargoDao.saveCargo(cargo);
+        }
+        catch (Exception e){
+            LOGGER.warn("Something went wrong\n", e);
+            throw new TruckingServiceException(e);
+        }
     }
 
     @Override
-    public void updateCargo(Cargo cargo) {
-        cargoDao.updateCargo(cargo);
+    public void updateCargo(Cargo cargo) throws TruckingServiceException {
+        try {
+            cargoDao.updateCargo(cargo);
+        }
+        catch (Exception e){
+            LOGGER.warn("Something went wrong\n", e);
+            throw new TruckingServiceException(e);
+        }
     }
 
     @Override
-    public List<Cargo> findAllCargoesOfOrder(Integer orderId) {
-        return cargoDao.findAllCargoesOfOrder(orderId);
+    public List<Cargo> findAllCargoesOfOrder(Integer orderId) throws TruckingServiceException {
+        try {
+            return cargoDao.findAllCargoesOfOrder(orderId);
+        }
+        catch (Exception e){
+            LOGGER.warn("Something went wrong\n", e);
+            throw new TruckingServiceException(e);
+        }
     }
 
     /**
@@ -81,48 +117,53 @@ public class CargoServiceImpl implements CargoService {
      * @return String with new Status and Status of Order if it changed
      */
     @Override
-    public String setCargoStatus(Cargo cargo, CargoStatus newStatus) {
-        Cargo entityCargo = findCargoById(cargo.getId());
-        CargoStatus oldStatus = entityCargo.getDelivery_status();
-        Order order = orderService.findOrderById(entityCargo.getOrder().getId());
-        Truck truck = truckService.findTruckById(order.getTruck().getId());
-        if(oldStatus.equals(CargoStatus.DELIVERED)
-                || cargo.getOrder().getOrderStatus().equals(OrderStatus.DONE)){
-            //
-        }
-        if(newStatus.equals(CargoStatus.SHIPPED)){
-            City currentProcessCity = cityService.findCityById(entityCargo.getWaypoint().getCityDep().getId());
-            truck.setCity(currentProcessCity);
-            truckService.updateTruck(truck);
+    public String setCargoStatus(Cargo cargo, CargoStatus newStatus)
+            throws TruckingServiceException, CargoAlreadyDeliveredException {
+        try {
+            Cargo entityCargo = findCargoById(cargo.getId());
+            CargoStatus oldStatus = entityCargo.getDelivery_status();
+            Order order = orderService.findOrderById(entityCargo.getOrder().getId());
+            Truck truck = truckService.findTruckById(order.getTruck().getId());
+            if (oldStatus.equals(CargoStatus.DELIVERED)
+                    || cargo.getOrder().getOrderStatus().equals(OrderStatus.DONE)) {
+                throw new CargoAlreadyDeliveredException("Cargo ID: " + entityCargo.getId());
+            }
+            if (newStatus.equals(CargoStatus.SHIPPED)) {
+                City currentProcessCity = cityService.findCityById(entityCargo.getWaypoint().getCityDep().getId());
+                truck.setCity(currentProcessCity);
+                truckService.updateTruck(truck);
 
-            entityCargo.setDelivery_status(newStatus);
-            cargoDao.updateCargo(entityCargo);
-            return "shipped";
-        }
-        else {
-            City currentProcessCity = cityService.findCityById(entityCargo.getWaypoint().getCityDest().getId());
-            truck.setCity(currentProcessCity);
-            truckService.updateTruck(truck);
+                entityCargo.setDelivery_status(newStatus);
+                cargoDao.updateCargo(entityCargo);
+                return "shipped";
+            } else {
+                City currentProcessCity = cityService.findCityById(entityCargo.getWaypoint().getCityDest().getId());
+                truck.setCity(currentProcessCity);
+                truckService.updateTruck(truck);
 
-            entityCargo.setDelivery_status(newStatus);
-            cargoDao.updateCargo(entityCargo);
-            List<Cargo> cargoes = cargoDao.findAllCargoesOfOrder(cargo.getOrder().getId());
-            int count = 0;
-            for (Cargo cargoFromList: cargoes
-                 ) {
-                if(cargoFromList.getDelivery_status().equals(CargoStatus.DELIVERED)){
-                    count++;
+                entityCargo.setDelivery_status(newStatus);
+                cargoDao.updateCargo(entityCargo);
+                List<Cargo> cargoes = cargoDao.findAllCargoesOfOrder(cargo.getOrder().getId());
+                int count = 0;
+                for (Cargo cargoFromList : cargoes
+                        ) {
+                    if (cargoFromList.getDelivery_status().equals(CargoStatus.DELIVERED)) {
+                        count++;
+                    }
+                }
+                if (cargoes.size() == count) {
+                    order.setOrderStatus(OrderStatus.DONE);
+                    orderService.updateOrder(order);
+                    orderService.removeTruckAndDriversFromOrder(order);
+                    return "done";
+                } else {
+                    return "delivered";
                 }
             }
-            if(cargoes.size()==count){
-                order.setOrderStatus(OrderStatus.DONE);
-                orderService.updateOrder(order);
-                orderService.removeTruckAndDriversFromOrder(order);
-                return "done";
-            }
-            else {
-                return "delivered";
-            }
+        }
+        catch (Exception e){
+            LOGGER.warn("Something went wrong\n", e);
+            throw new TruckingServiceException(e);
         }
     }
 }

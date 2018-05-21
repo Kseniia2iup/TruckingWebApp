@@ -13,11 +13,10 @@ import org.springframework.ui.Model;
 import org.springframework.ui.ModelMap;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
+import ru.tsystems.javaschool.exceptions.TruckingServiceException;
 import ru.tsystems.javaschool.model.User;
 import ru.tsystems.javaschool.model.enums.Role;
-import ru.tsystems.javaschool.service.DriverService;
 import ru.tsystems.javaschool.service.UserService;
-import ru.tsystems.javaschool.service.WaypointService;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -28,7 +27,7 @@ import java.util.List;
 @RequestMapping("/")
 public class MainController {
 
-    private static final Logger LOG = LoggerFactory.getLogger(MainController.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(MainController.class);
 
     private static final String USER_LIST_VIEW_PATH = "redirect:/admin/listUsers";
     private static final String ADD_USER_VIEW_PATH = "newuser";
@@ -38,13 +37,13 @@ public class MainController {
     private UserService userService;
 
     @Autowired
-    public void setMessageSource(MessageSource messageSource) {
-        this.messageSource = messageSource;
+    public void setUserService(UserService userService) {
+        this.userService = userService;
     }
 
     @Autowired
-    public void setUserService(UserService userService) {
-        this.userService = userService;
+    public void setMessageSource(MessageSource messageSource) {
+        this.messageSource = messageSource;
     }
 
     @GetMapping(path = {"/", "/home", "/welcome", "/index"})
@@ -87,7 +86,7 @@ public class MainController {
 
 
     @RequestMapping(value = { "/admin/listUsers" }, method = RequestMethod.GET)
-    public String listUsers(ModelMap model) {
+    public String listUsers(ModelMap model) throws TruckingServiceException {
         List<User> users = userService.findAllUsers();
         model.addAttribute("users", users);
         return "allusers";
@@ -103,10 +102,11 @@ public class MainController {
 
     @PostMapping(path = "/admin/newUser")
     public String saveRegistration(@Valid User user,
-                                   BindingResult result, ModelMap model) {
+                                   BindingResult result, ModelMap model)
+            throws TruckingServiceException {
 
         if (result.hasErrors()) {
-            LOG.debug("There are errors while new user registration");
+            LOGGER.debug("There are errors while new user registration");
             return ADD_USER_VIEW_PATH;
         }
         if (!userService.isUserValid(user)){
@@ -114,14 +114,14 @@ public class MainController {
         }
         userService.save(user);
 
-        LOG.info("From MainController saveRegistration method:\nLogin : {}\nChecking UsrProfiles....",user.getLogin());
+        LOGGER.info("From MainController saveRegistration method:\nLogin : {}\nChecking UsrProfiles....",user.getLogin());
 
         model.addAttribute("success", "User " + user.getLogin() + " has been registered successfully");
         return "registrationsuccess";
     }
 
     @RequestMapping(value = { "/admin/edit-user-{login}" }, method = RequestMethod.GET)
-    public String editUser(@PathVariable String login, ModelMap model) {
+    public String editUser(@PathVariable String login, ModelMap model){
         User user = userService.findByLogin(login);
         model.addAttribute("user", user);
         model.addAttribute("edit", true);
@@ -130,7 +130,8 @@ public class MainController {
 
     @RequestMapping(value = { "/admin/edit-user-{login}" }, method = RequestMethod.POST)
     public String updateUser(@Valid User user, BindingResult result,
-                             ModelMap model, @PathVariable String login) {
+                             ModelMap model, @PathVariable String login)
+            throws TruckingServiceException {
 
         if (result.hasErrors()) {
             model.addAttribute("user", user);
@@ -144,7 +145,7 @@ public class MainController {
     }
 
     @RequestMapping(value = { "/admin/delete-user-{login}" }, method = RequestMethod.GET)
-    public String deleteUser(@PathVariable String login) {
+    public String deleteUser(@PathVariable String login) throws TruckingServiceException {
         userService.delete(userService.findByLogin(login).getId());
         return USER_LIST_VIEW_PATH;
     }

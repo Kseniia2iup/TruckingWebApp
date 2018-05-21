@@ -5,6 +5,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.stereotype.Component;
+import ru.tsystems.javaschool.exceptions.TruckingDaoException;
 import ru.tsystems.javaschool.model.Truck;
 import ru.tsystems.javaschool.service.TruckService;
 
@@ -27,10 +28,16 @@ public class TruckConverter implements Converter<Object, Truck>{
             LOG.debug("From TruckConverter convert method\nProfile : {}", truck);
         }
         catch (Exception e){
-            LOG.debug("From TruckConverter convert method\nProfile : {}", e);
-            Integer id = Integer.parseInt((String)source);
-            truck = truckService.findTruckById(id);
-            LOG.info("From TruckConverter convert method\nProfile : {}", truck);
+            try {
+                LOG.debug("From TruckConverter convert method\nProfile : {}", e);
+                Integer id = Integer.parseInt((String) source);
+                truck = truckService.findTruckById(id);
+                LOG.info("From TruckConverter convert method\nProfile : {}", truck);
+            }
+            catch (Exception ex){
+                LOG.warn("From TruckConverter convert method\nProfile : {}", ex);
+                truck = null;
+            }
         }
         return truck;
     }

@@ -11,7 +11,7 @@ import ru.tsystems.javaschool.service.CityService;
 @Component
 public class CityIdToCityConverter implements Converter<Object, City> {
 
-    private static final Logger LOG = LoggerFactory.getLogger(CityIdToCityConverter.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(CityIdToCityConverter.class);
 
     private CityService cityService;
 
@@ -22,9 +22,15 @@ public class CityIdToCityConverter implements Converter<Object, City> {
 
     @Override
     public City convert(Object source) {
-        Integer id = Integer.parseInt((String)source);
-        City city = cityService.findCityById(id);
-        LOG.info("From CityIdToCityConverter convert method\nProfile : {}", city);
-        return city;
+        try {
+            Integer id = Integer.parseInt((String) source);
+            City city = cityService.findCityById(id);
+            LOGGER.info("From CityIdToCityConverter convert method\nProfile : {}", city);
+            return city;
+        }
+        catch (Exception e){
+            LOGGER.warn("From CityIdToCityConverter convert method\nProfile : {}", e);
+            return null;
+        }
     }
 }

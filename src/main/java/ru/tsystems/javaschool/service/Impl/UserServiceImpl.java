@@ -1,9 +1,12 @@
 package ru.tsystems.javaschool.service.Impl;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import ru.tsystems.javaschool.exceptions.TruckingServiceException;
 import ru.tsystems.javaschool.model.User;
 import ru.tsystems.javaschool.repository.UserDao;
 import ru.tsystems.javaschool.service.UserService;
@@ -13,6 +16,8 @@ import java.util.List;
 @Service("userService")
 @Transactional
 public class UserServiceImpl implements UserService {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(UserServiceImpl.class);
 
     private UserDao dao;
 
@@ -28,29 +33,53 @@ public class UserServiceImpl implements UserService {
         this.passwordEncoder = passwordEncoder;
     }
 
-    public void save(User user){
-        user.setPassword(passwordEncoder.encode(user.getPassword()));
-        dao.save(user);
-    }
-
-    @Override
-    public void updateUser(User user) {
-        User entity = dao.findById(user.getId());
-        if(entity!=null){
-            entity.setLogin(user.getLogin());
-            entity.setPassword(user.getPassword());
-            //entity.setEmail(user.getEmail());
-            entity.setRole(user.getRole());
+    public void save(User user) throws TruckingServiceException {
+        try {
+            user.setPassword(passwordEncoder.encode(user.getPassword()));
+            dao.save(user);
+        }
+        catch (Exception e){
+            LOGGER.warn("Something went wrong\n", e);
+            throw new TruckingServiceException(e);
         }
     }
 
     @Override
-    public void delete(Integer id) {
-        dao.delete(id);
+    public void updateUser(User user) throws TruckingServiceException {
+        try {
+            User entity = dao.findById(user.getId());
+            if (entity != null) {
+                entity.setLogin(user.getLogin());
+                entity.setPassword(user.getPassword());
+                //entity.setEmail(user.getEmail());
+                entity.setRole(user.getRole());
+            }
+        }
+        catch (Exception e){
+            LOGGER.warn("Something went wrong\n", e);
+            throw new TruckingServiceException(e);
+        }
     }
 
-    public User findById(int id) {
-        return dao.findById(id);
+    @Override
+    public void delete(Integer id) throws TruckingServiceException {
+        try {
+            dao.delete(id);
+        }
+        catch (Exception e){
+            LOGGER.warn("Something went wrong\n", e);
+            throw new TruckingServiceException(e);
+        }
+    }
+
+    public User findById(int id) throws TruckingServiceException {
+        try {
+            return dao.findById(id);
+        }
+        catch (Exception e){
+            LOGGER.warn("Something went wrong\n", e);
+            throw new TruckingServiceException(e);
+        }
     }
 
     public User findByLogin(String login) {
@@ -58,11 +87,17 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public boolean isUserValid(User user) {
-        return (user.getLogin()!=null && user.getPassword()!=null
-                && user.getLogin().length()>=3
-                && user.getPassword().length()>=5
-                && isUserLoginUnique(user.getLogin()));
+    public boolean isUserValid(User user) throws TruckingServiceException {
+        try {
+            return (user.getLogin() != null && user.getPassword() != null
+                    && user.getLogin().length() >= 3
+                    && user.getPassword().length() >= 5
+                    && isUserLoginUnique(user.getLogin()));
+        }
+        catch (Exception e){
+            LOGGER.warn("Something went wrong\n", e);
+            throw new TruckingServiceException(e);
+        }
     }
 
     @Override
@@ -71,7 +106,13 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public List<User> findAllUsers() {
-        return dao.findAllUsers();
+    public List<User> findAllUsers() throws TruckingServiceException {
+        try {
+            return dao.findAllUsers();
+        }
+        catch (Exception e){
+            LOGGER.warn("Something went wrong\n", e);
+            throw new TruckingServiceException(e);
+        }
     }
 }

@@ -11,9 +11,11 @@
     <link href="<c:url value="/static/css/menu.css" />" rel="stylesheet" />
 </head>
 <body>
-<div class="page-header"></div>
+<div class="container">
+    <div class="success">
 Dear <strong>${user}</strong>, You are not authorized to access this page.
-<br/>
-<a href="<c:url value="/index" />">Go to home</a> OR <a href="<c:url value="/logout" />">Logout</a>
+<br/> <a href="<c:url value="/logout" />">Logout</a>
+    </div>
+</div>
 </body>
 </html>

@@ -7,6 +7,8 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import ru.tsystems.javaschool.exceptions.NoCargoInTheOrderException;
+import ru.tsystems.javaschool.exceptions.TruckingServiceException;
 import ru.tsystems.javaschool.model.*;
 import ru.tsystems.javaschool.model.enums.CargoStatus;
 import ru.tsystems.javaschool.model.enums.OrderStatus;
@@ -39,13 +41,13 @@ public class OrderController {
     DriverService driverService;
 
     @GetMapping(path = "manager/listOrders")
-    public String listOfOrders(Model model){
+    public String listOfOrders(Model model) throws TruckingServiceException {
         model.addAttribute("orders", orderService.findAllOrders());
         return "allorders";
     }
 
     @GetMapping(path = "manager/newOrder")
-    public String newOrder(Model model){
+    public String newOrder(Model model) throws TruckingServiceException{
         Order order = new Order();
         order.setOrderStatus(OrderStatus.CREATED);
         orderService.saveOrder(order);
@@ -54,7 +56,7 @@ public class OrderController {
     }
 
     @GetMapping(path = "manager/{orderId}/listOrderCargoes")
-    public String listCargoes(@PathVariable Integer orderId, Model model){
+    public String listCargoes(@PathVariable Integer orderId, Model model) throws TruckingServiceException {
         Order order = orderService.findOrderById(orderId);
         Truck truck = null;
         if(order.getTruck()!=null){
@@ -67,7 +69,8 @@ public class OrderController {
     }
 
     @GetMapping(path = "manager/{orderId}/newCargo")
-    public String newCargo(@PathVariable Integer orderId, Model model){
+    public String newCargo(@PathVariable Integer orderId, Model model)
+            throws TruckingServiceException{
         if(orderService.findOrderById(orderId).getTruck()!=null ||
                 orderService.findOrderById(orderId).getOrderStatus() != OrderStatus.CREATED){
             return ORDER_LIST_VIEW_PATH;
@@ -78,7 +81,8 @@ public class OrderController {
     }
 
     @PostMapping(path = "manager/{orderId}/newCargo")
-    public String saveCargo(@PathVariable Integer orderId, Cargo cargo, Model model){
+    public String saveCargo(@PathVariable Integer orderId, Cargo cargo, Model model)
+            throws TruckingServiceException{
         model.addAttribute("order", orderService.findOrderById(orderId));
         Order order = orderService.findOrderById(orderId);
         cargo.setOrder(order);
@@ -94,7 +98,8 @@ public class OrderController {
     }
 
     @GetMapping(path = "manager/{id}/setOrderTruck")
-    public String setTruckToOrder(@PathVariable Integer id, Model model){
+    public String setTruckToOrder(@PathVariable Integer id, Model model)
+            throws TruckingServiceException, NoCargoInTheOrderException {
         Order order = orderService.findOrderById(id);
         if(cargoService.findAllCargoesOfOrder(id)==null ||
                 ((order.getOrderStatus() != OrderStatus.CREATED)
@@ -109,7 +114,8 @@ public class OrderController {
     }
 
     @PostMapping(path = "manager/{id}/setOrderTruck")
-    public String saveTruckToOrder(@PathVariable Integer id, Order order, Model model){
+    public String saveTruckToOrder(@PathVariable Integer id, Order order, Model model)
+            throws TruckingServiceException, NoCargoInTheOrderException{
         Order entityOrder = orderService.findOrderById(id);
         model.addAttribute("order", entityOrder);
         model.addAttribute("trucks",
@@ -120,7 +126,7 @@ public class OrderController {
     }
 
     @GetMapping(path = "manager/{id}/setOrderDrivers")
-    public String setDriversToOrder(@PathVariable Integer id, Model model){
+    public String setDriversToOrder(@PathVariable Integer id, Model model) throws TruckingServiceException{
         Order order = orderService.findOrderById(id);
         if(cargoService.findAllCargoesOfOrder(id)==null ||
                 order.getTruck()==null ||
@@ -137,7 +143,8 @@ public class OrderController {
     }
 
     @PostMapping(path = "manager/{id}/setOrderDrivers")
-    public String saveDriversToOrder(@PathVariable Integer id, Driver newDriver, Model model){
+    public String saveDriversToOrder(@PathVariable Integer id, Driver newDriver, Model model)
+            throws TruckingServiceException{
         Driver driver = driverService.findDriverById(newDriver.getId());
         Order entityOrder = orderService.findOrderById(id);
         driver.setOrder(entityOrder);
@@ -147,7 +154,7 @@ public class OrderController {
     }
 
     @GetMapping(path = "manager/{id}/complete")
-    public String completeOrderCreation(@PathVariable Integer id, Model model){
+    public String completeOrderCreation(@PathVariable Integer id, Model model) throws TruckingServiceException{
         Order order = orderService.findOrderById(id);
         if(cargoService.findAllCargoesOfOrder(id)==null||
                 orderService.findOrderById(id).getTruck()==null ||
@@ -162,7 +169,7 @@ public class OrderController {
     }
 
     @ModelAttribute("cities")
-    public List<City> cityList(){
+    public List<City> cityList() throws TruckingServiceException{
         return cityService.findAllCities();
     }
 

@@ -1,5 +1,6 @@
 package ru.tsystems.javaschool.service;
 
+import ru.tsystems.javaschool.exceptions.TruckingServiceException;
 import ru.tsystems.javaschool.model.Driver;
 import ru.tsystems.javaschool.model.Order;
 import ru.tsystems.javaschool.model.Truck;
@@ -9,29 +10,29 @@ import java.util.List;
 
 public interface DriverService {
 
-    Driver findDriverById(Integer id);
+    Driver findDriverById(Integer id) throws TruckingServiceException;
 
-    void deleteDriver(Integer id);
+    void deleteDriver(Integer id) throws TruckingServiceException;
 
-    void saveDriver(Driver driver);
+    void saveDriver(Driver driver) throws TruckingServiceException;
 
-    void updateDriver(Driver driver);
+    void updateDriver(Driver driver) throws TruckingServiceException;
 
-    List<Driver> findAllDrivers();
+    List<Driver> findAllDrivers() throws TruckingServiceException;
 
-    Integer getLastDriverId();
+    Integer getLastDriverId() throws TruckingServiceException;
 
-    String generateDriverLogin(Driver driver);
+    String generateDriverLogin(Driver driver) throws TruckingServiceException;
 
     String generateDriverPassword();
 
-    List<Driver> findAllDriversSuitableForOrder(Order order);
+    List<Driver> findAllDriversSuitableForOrder(Order order) throws TruckingServiceException;
 
-    List<Driver> getAllDriversOfTruck(Truck truck);
+    List<Driver> getAllDriversOfTruck(Truck truck) throws TruckingServiceException;
 
-    List<Driver> getAllDriversOfOrder(Order order);
+    List<Driver> getAllDriversOfOrder(Order order) throws TruckingServiceException;
 
-    List<Driver> findCoWorkers(Driver driver);
+    List<Driver> findCoWorkers(Driver driver) throws TruckingServiceException;
 
-    void setDriverStatus(Driver driver, DriverStatus newStatus);
+    void setDriverStatus(Driver driver, DriverStatus newStatus) throws TruckingServiceException;
 }

@@ -12,6 +12,8 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import ru.tsystems.javaschool.exceptions.CargoAlreadyDeliveredException;
+import ru.tsystems.javaschool.exceptions.TruckingServiceException;
 import ru.tsystems.javaschool.model.*;
 import ru.tsystems.javaschool.model.enums.CargoStatus;
 import ru.tsystems.javaschool.model.enums.DriverStatus;
@@ -23,7 +25,7 @@ import java.util.List;
 @Controller
 public class DriverPageController {
 
-    private static final Logger LOG = LoggerFactory.getLogger(DriverPageController.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(DriverPageController.class);
 
     private DriverService driverService;
 
@@ -68,7 +70,7 @@ public class DriverPageController {
     }
 
     @GetMapping(path = "/driver")
-    public String driverPage(ModelMap model) {
+    public String driverPage(ModelMap model) throws TruckingServiceException {
         User user = userService.findByLogin(getPrincipal());
         model.addAttribute("user", getPrincipal());
         Driver driver =  driverService.findDriverById(user.getId());
@@ -91,26 +93,30 @@ public class DriverPageController {
     }
 
     @GetMapping(path = "driver/{id}/setStatus")
-    public String setDriverStatus(@PathVariable Integer id, Model model){
+    public String setDriverStatus(@PathVariable Integer id, Model model)
+            throws TruckingServiceException{
         model.addAttribute("driver", driverService.findDriverById(id));
         return "setdriverstatus";
     }
 
     @PostMapping(path = "driver/{id}/setStatus")
-    public String saveDriverStatus(@PathVariable Integer id, Driver driver, Model model){
+    public String saveDriverStatus(@PathVariable Integer id, Driver driver, Model model)
+            throws TruckingServiceException{
         Driver entityDriver = driverService.findDriverById(id);
         driverService.setDriverStatus(entityDriver,driver.getStatus());
         return "redirect:/driver";
     }
 
     @GetMapping(path = "driver/{id}/loaded")
-    public String loadCargo(@PathVariable Integer id, Cargo cargo, Model model){
+    public String loadCargo(@PathVariable Integer id, Cargo cargo, Model model)
+            throws TruckingServiceException, CargoAlreadyDeliveredException {
         cargoService.setCargoStatus(cargoService.findCargoById(id), CargoStatus.SHIPPED);
         return "redirect:/driver";
     }
 
     @GetMapping(path = "driver/{id}/unloaded")
-    public String unloadCargo(@PathVariable Integer id, Cargo cargo, Model model){
+    public String unloadCargo(@PathVariable Integer id, Cargo cargo, Model model)
+            throws TruckingServiceException, CargoAlreadyDeliveredException{
         String result =
                 cargoService.setCargoStatus(cargoService.findCargoById(id), CargoStatus.DELIVERED);
         if(result.equals("done")){
@@ -127,7 +133,7 @@ public class DriverPageController {
     }
 
     @GetMapping(path = "driver/{id}/truckIsBroken")
-    public String truckIsBroken(@PathVariable Integer id, Model model){
+    public String truckIsBroken(@PathVariable Integer id, Model model) throws TruckingServiceException{
         truckService.markTruckAsBrokenWhileOrder(driverService.findDriverById(id).getCurrentTruck().getId());
         return "redirect:/driver";
     }
@@ -145,7 +151,7 @@ public class DriverPageController {
     }
 
     @ModelAttribute("cities")
-    public List<City> cityList(){
+    public List<City> cityList() throws TruckingServiceException{
         return cityService.findAllCities();
     }
 

@@ -6,6 +6,7 @@ import org.springframework.ui.Model;
 import org.springframework.ui.ModelMap;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
+import ru.tsystems.javaschool.exceptions.TruckingServiceException;
 import ru.tsystems.javaschool.model.City;
 import ru.tsystems.javaschool.model.Driver;
 import ru.tsystems.javaschool.model.User;
@@ -46,14 +47,14 @@ public class DriverController {
     }
 
     @RequestMapping(path = "manager/listDrivers")
-    public String listOfDrivers(Model model){
+    public String listOfDrivers(Model model) throws TruckingServiceException {
         model.addAttribute("drivers", driverService.findAllDrivers());
         return "alldrivers";
     }
 
 
     @GetMapping(path = { "manager/delete-{id}-driver" })
-    public String deleteTruck(@PathVariable Integer id) {
+    public String deleteTruck(@PathVariable Integer id) throws TruckingServiceException {
         driverService.deleteDriver(id);
         userService.delete(id);
         return DRIVER_LIST_VIEW_PATH;
@@ -68,7 +69,7 @@ public class DriverController {
 
     @PostMapping(path = { "manager/newDriver" })
     public String saveDriver(@ModelAttribute Driver driver, BindingResult result,
-                            ModelMap model) {
+                            ModelMap model) throws TruckingServiceException {
 
         if (result.hasErrors()) {
             return ADD_DRIVER_VIEW_PATH;
@@ -90,7 +91,7 @@ public class DriverController {
 
 
     @GetMapping(value = { "manager/edit-{id}-driver" })
-    public String editDriver(@PathVariable Integer id, ModelMap model) {
+    public String editDriver(@PathVariable Integer id, ModelMap model) throws TruckingServiceException {
         Driver driver = driverService.findDriverById(id);
         model.addAttribute("driver", driver);
         model.addAttribute("edit", true);
@@ -99,7 +100,7 @@ public class DriverController {
 
     @PostMapping(value = { "manager/edit-{id}-driver" })
     public String editDriver(@Valid Driver driver, BindingResult result,
-                             ModelMap model, @PathVariable Integer id) {
+                             ModelMap model, @PathVariable Integer id) throws TruckingServiceException {
 
         if (result.hasErrors()) {
             model.addAttribute("edit", true);
@@ -114,7 +115,7 @@ public class DriverController {
     }
 
     @ModelAttribute("cities")
-    public List<City> cityList(){
+    public List<City> cityList() throws TruckingServiceException {
         return cityService.findAllCities();
     }
 
