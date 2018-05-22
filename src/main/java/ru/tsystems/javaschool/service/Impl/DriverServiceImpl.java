@@ -8,12 +8,10 @@ import org.springframework.transaction.annotation.Transactional;
 import ru.tsystems.javaschool.exceptions.TruckingServiceException;
 import ru.tsystems.javaschool.model.Driver;
 import ru.tsystems.javaschool.model.Order;
-import ru.tsystems.javaschool.model.OrderHistory;
 import ru.tsystems.javaschool.model.Truck;
 import ru.tsystems.javaschool.model.enums.DriverStatus;
 import ru.tsystems.javaschool.repository.DriverDao;
 import ru.tsystems.javaschool.service.DriverService;
-import ru.tsystems.javaschool.service.OrderHistoryService;
 import ru.tsystems.javaschool.service.OrderService;
 import ru.tsystems.javaschool.service.UserService;
 
@@ -35,13 +33,6 @@ public class DriverServiceImpl implements DriverService {
     private DriverDao driverDao;
 
     private OrderService orderService;
-
-    private OrderHistoryService orderHistoryService;
-
-    @Autowired
-    public void setOrderHistoryService(OrderHistoryService orderHistoryService) {
-        this.orderHistoryService = orderHistoryService;
-    }
 
     @Autowired
     public void setOrderService(OrderService orderService) {
@@ -73,6 +64,7 @@ public class DriverServiceImpl implements DriverService {
     @Override
     public void deleteDriver(Integer id) throws TruckingServiceException {
         try {
+            Driver driver = findDriverById(id);
             driverDao.deleteDriver(id);
         }
         catch (Exception e){
@@ -254,9 +246,9 @@ public class DriverServiceImpl implements DriverService {
 
     /**
      * Set new status of work to the Driver. If Driver had status REST and newStatus not Rest
-     * set current Date to shiftBegined field at OrderHistory
+     * set current Date to shiftBegined field
      * If Driver has newStatus as Rest and old one is not set current Date to shiftEnded
-     * field at OrderHistory and then calculate approximately hours of work and update
+     * field and then calculate approximately hours of work and update
      * Driver field workedThisMonth
      * @param driver that needs status to change
      * @param newStatus new status to the Driver
@@ -265,20 +257,9 @@ public class DriverServiceImpl implements DriverService {
     public void setDriverStatus(Driver driver, DriverStatus newStatus) throws TruckingServiceException {
         try {
             DriverStatus oldStatus = driver.getStatus();
-            OrderHistory history;
-
-            if (driver.getHistory() != null) {
-                history = driver.getHistory();
-                orderHistoryService.updateHistory(history);
-            } else {
-                history = new OrderHistory();
-                history.setDriver(driver);
-                orderHistoryService.saveHistory(history);
-            }
 
             if (oldStatus.equals(DriverStatus.REST) && !newStatus.equals(DriverStatus.REST)) {
-                history.setShiftBegined(new Date(System.currentTimeMillis()));
-                orderHistoryService.updateHistory(history);
+                driver.setShiftBegined(new Date(System.currentTimeMillis()));
 
                 driver.setStatus(newStatus);
                 updateDriver(driver);
@@ -286,13 +267,12 @@ public class DriverServiceImpl implements DriverService {
 
             //If Driver has ended shift add new hours of work to workedThisMonth field
             else if (!oldStatus.equals(DriverStatus.REST) && newStatus.equals(DriverStatus.REST)) {
-                history.setShiftEnded(new Date(System.currentTimeMillis()));
-                orderHistoryService.updateHistory(history);
+                driver.setShiftEnded(new Date(System.currentTimeMillis()));
 
                 LocalDateTime shiftBegan = LocalDateTime.ofInstant(
-                        history.getShiftBegined().toInstant(), ZoneId.systemDefault());
+                        driver.getShiftBegined().toInstant(), ZoneId.systemDefault());
                 LocalDateTime shiftEnded = LocalDateTime.ofInstant(
-                        history.getShiftEnded().toInstant(), ZoneId.systemDefault());
+                        driver.getShiftEnded().toInstant(), ZoneId.systemDefault());
 
                 if (shiftBegan.getMonthValue() != shiftEnded.getMonthValue()) {
                     driver.setWorkedThisMonth(shiftEnded.getDayOfMonth() * 24 + shiftEnded.getHour());

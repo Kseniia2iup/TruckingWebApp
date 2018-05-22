@@ -77,7 +77,7 @@ public class OrderDaoImpl extends AbstractDao<Integer, Order> implements OrderDa
     public List<Order> findAllOrders() throws TruckingDaoException {
         try {
             Query query = getSession().createQuery("Select O from Order O" +
-                    " Left Join Fetch O.truck T Left Join Fetch T.city");
+                    " Left Join Fetch O.truck T Left Join Fetch T.city Order by O.id");
             return query.list();
         } catch (Exception e){
             LOGGER.warn("From OrderDaoImpl method findAllOrders something went wrong:\n", e);

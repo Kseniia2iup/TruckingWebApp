@@ -116,7 +116,7 @@ public class DriverDaoImpl extends AbstractDao<Integer, Driver> implements Drive
     public List<Driver> getAllFreeDriversForTruck(Truck truck) throws TruckingDaoException {
         try {
             Query query = getSession().createQuery("Select D from Driver D Join Fetch D.city " +
-                    "Left Join Fetch D.history Left Join Fetch D.currentTruck Left Join Fetch D.order " +
+                    "Left Join Fetch D.currentTruck Left Join Fetch D.order " +
                     "Where D.currentTruck is null AND D.city = :truck_city Order by D.name");
             query.setParameter("truck_city", truck.getCity());
             return query.list();

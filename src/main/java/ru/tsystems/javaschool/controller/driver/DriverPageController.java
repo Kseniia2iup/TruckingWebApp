@@ -19,7 +19,11 @@ import ru.tsystems.javaschool.model.enums.CargoStatus;
 import ru.tsystems.javaschool.model.enums.DriverStatus;
 import ru.tsystems.javaschool.service.*;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 @Controller
@@ -72,7 +76,6 @@ public class DriverPageController {
     @GetMapping(path = "/driver")
     public String driverPage(ModelMap model) throws TruckingServiceException {
         User user = userService.findByLogin(getPrincipal());
-        model.addAttribute("user", getPrincipal());
         Driver driver =  driverService.findDriverById(user.getId());
         Truck truck = null;
         List<Driver> drivers = new ArrayList<>();
@@ -84,6 +87,7 @@ public class DriverPageController {
         if(driver.getOrder()!= null){
             waypoints = waypointService.findAllWaypointsByOrderId(driver.getOrder().getId());
         }
+        model.addAttribute("user", getPrincipal());
         model.addAttribute("driver", driver);
         model.addAttribute("truck", truck);
         model.addAttribute("drivers", drivers);
@@ -96,6 +100,7 @@ public class DriverPageController {
     public String setDriverStatus(@PathVariable Integer id, Model model)
             throws TruckingServiceException{
         model.addAttribute("driver", driverService.findDriverById(id));
+        model.addAttribute("user", getPrincipal());
         return "setdriverstatus";
     }
 
@@ -127,8 +132,9 @@ public class DriverPageController {
 
     @GetMapping(path = "driver/orderisdone")
     public String showOrderIsDonSuccessPage(Model model){
-            model.addAttribute("message", "Order is successfully done!" +
+        model.addAttribute("message", "Order is successfully done!" +
                     "\n Thank you!");
+        model.addAttribute("user", getPrincipal());
         return "orderisdone";
     }
 
@@ -158,5 +164,12 @@ public class DriverPageController {
     @ModelAttribute("driverStatuses")
     public DriverStatus[] driverStatuses(){
         return DriverStatus.values();
+    }
+
+    @ModelAttribute("date")
+    public LocalDate currentDate(){
+        LocalDateTime localDate = LocalDateTime.ofInstant(new Date(System.currentTimeMillis()).toInstant(), ZoneId.systemDefault());
+        LocalDate toLocalDate = localDate.toLocalDate();
+        return toLocalDate;
     }
 }

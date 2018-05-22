@@ -1,6 +1,8 @@
 package ru.tsystems.javaschool.controller.manager;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.ui.ModelMap;
@@ -17,6 +19,10 @@ import ru.tsystems.javaschool.service.DriverService;
 import ru.tsystems.javaschool.service.UserService;
 
 import javax.validation.Valid;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.util.Date;
 import java.util.List;
 
 @Controller
@@ -49,12 +55,13 @@ public class DriverController {
     @RequestMapping(path = "manager/listDrivers")
     public String listOfDrivers(Model model) throws TruckingServiceException {
         model.addAttribute("drivers", driverService.findAllDrivers());
+        model.addAttribute("user", getPrincipal());
         return "alldrivers";
     }
 
 
     @GetMapping(path = { "manager/delete-{id}-driver" })
-    public String deleteTruck(@PathVariable Integer id) throws TruckingServiceException {
+    public String deleteDriver(@PathVariable Integer id) throws TruckingServiceException {
         driverService.deleteDriver(id);
         userService.delete(id);
         return DRIVER_LIST_VIEW_PATH;
@@ -64,6 +71,7 @@ public class DriverController {
     public String newDriver(ModelMap model) {
         model.addAttribute("driver", new Driver());
         model.addAttribute("edit", false);
+        model.addAttribute("user", getPrincipal());
         return ADD_DRIVER_VIEW_PATH;
     }
 
@@ -95,6 +103,7 @@ public class DriverController {
         Driver driver = driverService.findDriverById(id);
         model.addAttribute("driver", driver);
         model.addAttribute("edit", true);
+        model.addAttribute("user", getPrincipal());
         return ADD_DRIVER_VIEW_PATH;
     }
 
@@ -114,6 +123,18 @@ public class DriverController {
         return DRIVER_LIST_VIEW_PATH;
     }
 
+    private String getPrincipal(){
+        String userName = null;
+        Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+
+        if (principal instanceof UserDetails) {
+            userName = ((UserDetails)principal).getUsername();
+        } else {
+            userName = principal.toString();
+        }
+        return userName;
+    }
+
     @ModelAttribute("cities")
     public List<City> cityList() throws TruckingServiceException {
         return cityService.findAllCities();
@@ -122,5 +143,12 @@ public class DriverController {
     @ModelAttribute("driverStatuses")
     public DriverStatus[] driverStatuses(){
         return DriverStatus.values();
+    }
+
+    @ModelAttribute("date")
+    public LocalDate currentDate(){
+        LocalDateTime localDate = LocalDateTime.ofInstant(new Date(System.currentTimeMillis()).toInstant(), ZoneId.systemDefault());
+        LocalDate toLocalDate = localDate.toLocalDate();
+        return toLocalDate;
     }
 }

@@ -21,6 +21,10 @@ import ru.tsystems.javaschool.service.UserService;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.util.Date;
 import java.util.List;
 
 @Controller
@@ -55,13 +59,13 @@ public class MainController {
     @GetMapping(path = "/admin")
     public String adminPage(ModelMap model) {
         model.addAttribute("user", getPrincipal());
-        return "admin";
+        return "redirect:/admin/listUsers";
     }
 
     @GetMapping(path = "/manager")
     public String managerPage(ModelMap model) {
         model.addAttribute("user", getPrincipal());
-        return "manager";
+        return "redirect:/manager/listOrders";
     }
 
     @GetMapping(value = "/Access_Denied")
@@ -88,6 +92,7 @@ public class MainController {
     @RequestMapping(value = { "/admin/listUsers" }, method = RequestMethod.GET)
     public String listUsers(ModelMap model) throws TruckingServiceException {
         List<User> users = userService.findAllUsers();
+        model.addAttribute("currentUser", getPrincipal());
         model.addAttribute("users", users);
         return "allusers";
     }
@@ -96,6 +101,7 @@ public class MainController {
     public String newRegistration(ModelMap model) {
         User user = new User();
         model.addAttribute("user", user);
+        model.addAttribute("currentUser", getPrincipal());
         model.addAttribute("edit", false);
         return ADD_USER_VIEW_PATH;
     }
@@ -123,6 +129,7 @@ public class MainController {
     @RequestMapping(value = { "/admin/edit-user-{login}" }, method = RequestMethod.GET)
     public String editUser(@PathVariable String login, ModelMap model){
         User user = userService.findByLogin(login);
+        model.addAttribute("currentUser", getPrincipal());
         model.addAttribute("user", user);
         model.addAttribute("edit", true);
         return ADD_USER_VIEW_PATH;
@@ -134,6 +141,7 @@ public class MainController {
             throws TruckingServiceException {
 
         if (result.hasErrors()) {
+            model.addAttribute("currentUser", getPrincipal());
             model.addAttribute("user", user);
             model.addAttribute("edit", true);
             return ADD_USER_VIEW_PATH;
@@ -173,6 +181,13 @@ public class MainController {
     @ModelAttribute("roles")
     public Role[] initializeProfiles() {
         return Role.values();
+    }
+
+    @ModelAttribute("date")
+    public LocalDate currentDate(){
+        LocalDateTime localDate = LocalDateTime.ofInstant(new Date(System.currentTimeMillis()).toInstant(), ZoneId.systemDefault());
+        LocalDate toLocalDate = localDate.toLocalDate();
+        return toLocalDate;
     }
 
 }

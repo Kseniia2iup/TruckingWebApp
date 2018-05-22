@@ -2,6 +2,8 @@ package ru.tsystems.javaschool.controller.manager;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.ui.ModelMap;
@@ -16,6 +18,10 @@ import ru.tsystems.javaschool.service.CityService;
 import ru.tsystems.javaschool.service.TruckService;
 
 import javax.validation.Valid;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
@@ -50,6 +56,7 @@ public class TruckController {
     public String listOfTrucks(Model model) throws TruckingServiceException {
         List<Truck> trucks = truckService.findAllTrucks();
         model.addAttribute("trucks", trucks);
+        model.addAttribute("user", getPrincipal());
         return "alltrucks";
     }
 
@@ -63,6 +70,7 @@ public class TruckController {
     public String newTruck(ModelMap model) {
         model.addAttribute("truck", new Truck());
         model.addAttribute("edit", false);
+        model.addAttribute("user", getPrincipal());
         return ADD_TRUCK_VIEW_PATH;
     }
 
@@ -97,6 +105,7 @@ public class TruckController {
             throws TruckingServiceException {
         model.addAttribute("truck", truckService.findTruckById(id));
         model.addAttribute("edit", true);
+        model.addAttribute("user", getPrincipal());
         return ADD_TRUCK_VIEW_PATH;
     }
 
@@ -135,6 +144,18 @@ public class TruckController {
         return TRUCK_LIST_VIEW_PATH;
     }
 
+    private String getPrincipal(){
+        String userName = null;
+        Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+
+        if (principal instanceof UserDetails) {
+            userName = ((UserDetails)principal).getUsername();
+        } else {
+            userName = principal.toString();
+        }
+        return userName;
+    }
+
     @ModelAttribute("cities")
     public List<City> cityList() throws TruckingServiceException {
         return cityService.findAllCities();
@@ -143,5 +164,12 @@ public class TruckController {
     @ModelAttribute("truckConditions")
     public TruckStatus[] truckConditions(){
         return TruckStatus.values();
+    }
+
+    @ModelAttribute("date")
+    public LocalDate currentDate(){
+        LocalDateTime localDate = LocalDateTime.ofInstant(new Date(System.currentTimeMillis()).toInstant(), ZoneId.systemDefault());
+        LocalDate toLocalDate = localDate.toLocalDate();
+        return toLocalDate;
     }
 }

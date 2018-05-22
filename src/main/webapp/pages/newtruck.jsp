@@ -8,28 +8,39 @@
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
     <title>Truck Registration Form</title>
-    <link href="<c:url value="/static/css/bootstrap.css" />" rel="stylesheet" />
-    <link href="<c:url value="/static/css/app.css" />" rel="stylesheet" />
-    <link href="<c:url value="/static/css/menu.css" />" rel="stylesheet" />
+    <meta charset="utf-8" />
+
+    <!--[if lte IE 8]><script src="/static/js/ie/html5shiv.js"></script><![endif]-->
+    <link href="<c:url value="/static/css/main.css"  />" rel="stylesheet" />
 </head>
-
 <body>
-<span style="font-size:30px;cursor:pointer;float: left" onclick="openNav()">&#9776;</span>
+<div id="wrapper">
+    <!-- Header -->
+    <header id="header">
+        <h1><a href="<c:url value="/manager/listOrders"/>">LogiWeb</a></h1>
+        <nav class="links">
+            <ul>
+                <li><a href="<c:url value="/manager/listDrivers"/> ">Drivers</a></li>
+                <li><a href="<c:url value="/manager/listTrucks"/>">Trucks</a></li>
+                <li><a href="<c:url value="/manager/listOrders"/>">Orders</a></li>
+                <li><a href="<c:url value="/logout" />">Logout</a></li>
+            </ul>
+        </nav>
+    </header>
 
-<div id="mySidenav" class="sidenav">
-    <a href="javascript:void(0)" class="closebtn" onclick="closeNav()">&times;</a>
-    <ul>
-        <li><a href="<c:url value="/manager/"/> ">Home</a></li>
-        <li><a href="<c:url value="/manager/listDrivers"/> ">Drivers</a></li>
-        <li><a href="<c:url value="/manager/listTrucks"/>">Trucks</a></li>
-        <li><a href="<c:url value="/manager/listOrders"/>">Orders</a></li>
-        <li><a href="<c:url value="/logout" />">Logout</a></li>
-    </ul>
-</div>
-<div class="container">
-    <div class="success">
-<h2>Add Truck Form</h2>
-
+    <!-- Main -->
+    <div id="main">
+        <!-- Post -->
+        <article class="post">
+            <header>
+                <div class="title">
+                    <h2>Add Truck From</h2>
+                </div>
+                <div class="meta">
+                    <time class="published" datetime="">${date}</time>
+                    <a href="<c:url value="/manager/listOrders"/>" class="author"><span class="name">${user}</span></a>
+                </div>
+            </header>
 <form:form method="POST" modelAttribute="truck" >
     <div class="row">
         <div class="form-group col-md-12">
@@ -79,7 +90,7 @@
         </div>
     </div>
 
-
+    <br/>
     <div class="row">
         <div class="form-actions floatRight">
             <c:choose>
@@ -97,16 +108,23 @@
 <br/>
 <br/>
         <a href="<c:url value='/manager/listTrucks' />" class="btn btn-success custom-width">List of All Trucks</a>
-</div>
-</div>
-<script>
-    function openNav() {
-        document.getElementById("mySidenav").style.width = "250px";
-    }
+        </article>
+    </div>
 
-    function closeNav() {
-        document.getElementById("mySidenav").style.width = "0";
-    }
-</script>
+    <!-- Sidebar -->
+    <section id="sidebar">
+
+        <!-- Intro -->
+        <section id="intro">
+            <a href="<c:url value="/manager/listOrders"/>" class="logo">
+                <img src="<c:url value="/static/images/logo.jpg"/>" alt="" /></a>
+            <header>
+                <h2>LogiWeb</h2>
+                <p>Would you like to create <a href="<c:url value='/manager/newTruck' />">A NEW TRUCK</a>
+                    <br/> Or see <a href="<c:url value='/manager/listTrucks' />" >List of All Trucks</a>?</p>
+            </header>
+        </section>
+    </section>
+</div>
 </body>
 </html>

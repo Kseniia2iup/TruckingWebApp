@@ -6,15 +6,27 @@
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
     <title>AccessDenied page</title>
-    <link href="<c:url value="/static/css/bootstrap.css" />" rel="stylesheet" />
-    <link href="<c:url value="/static/css/app.css" />" rel="stylesheet" />
-    <link href="<c:url value="/static/css/menu.css" />" rel="stylesheet" />
+    <meta charset="utf-8" />
+
+    <!--[if lte IE 8]><script src="/static/js/ie/html5shiv.js"></script><![endif]-->
+    <link href="<c:url value="/static/css/main.css"  />" rel="stylesheet" />
 </head>
 <body>
-<div class="container">
-    <div class="success">
-Dear <strong>${user}</strong>, You are not authorized to access this page.
+<div id="wrapper">
+    <!-- Header -->
+    <header id="header">
+        <h1>LogiWeb</h1>
+        <nav class="links">
+        </nav>
+    </header>
+
+    <!-- Main -->
+    <div id="main">
+        <!-- Post -->
+        <article class="post">
+Dear <strong>${user}</strong>, You are can't get access to this page.
 <br/> <a href="<c:url value="/logout" />">Logout</a>
+        </article>
     </div>
 </div>
 </body>

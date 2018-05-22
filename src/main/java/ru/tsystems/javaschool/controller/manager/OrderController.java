@@ -1,6 +1,8 @@
 package ru.tsystems.javaschool.controller.manager;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -14,6 +16,10 @@ import ru.tsystems.javaschool.model.enums.CargoStatus;
 import ru.tsystems.javaschool.model.enums.OrderStatus;
 import ru.tsystems.javaschool.service.*;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.util.Date;
 import java.util.List;
 
 @Controller
@@ -43,6 +49,7 @@ public class OrderController {
     @GetMapping(path = "manager/listOrders")
     public String listOfOrders(Model model) throws TruckingServiceException {
         model.addAttribute("orders", orderService.findAllOrders());
+        model.addAttribute("user", getPrincipal());
         return "allorders";
     }
 
@@ -52,6 +59,7 @@ public class OrderController {
         order.setOrderStatus(OrderStatus.CREATED);
         orderService.saveOrder(order);
         model.addAttribute("order", orderService.findOrderById(order.getId()));
+        model.addAttribute("user", getPrincipal());
         return "redirect:/manager/"+order.getId()+"/listOrderCargoes";
     }
 
@@ -65,6 +73,7 @@ public class OrderController {
         model.addAttribute("order", order);
         model.addAttribute("truck", truck);
         model.addAttribute("cargoes", cargoService.findAllCargoesOfOrder(orderId));
+        model.addAttribute("user", getPrincipal());
         return ADD_ORDER_VIEW_PATH;
     }
 
@@ -75,6 +84,7 @@ public class OrderController {
                 orderService.findOrderById(orderId).getOrderStatus() != OrderStatus.CREATED){
             return ORDER_LIST_VIEW_PATH;
         }
+        model.addAttribute("user", getPrincipal());
         model.addAttribute("order", orderService.findOrderById(orderId));
         model.addAttribute("cargo", new Cargo());
         return "newcargo";
@@ -107,6 +117,7 @@ public class OrderController {
             return ORDER_LIST_VIEW_PATH;
         }
         orderService.removeTruckAndDriversFromOrder(order);
+        model.addAttribute("user", getPrincipal());
         model.addAttribute("order", order);
         model.addAttribute("trucks",
                 truckService.findAllTrucksReadyForOrder(order));
@@ -135,6 +146,7 @@ public class OrderController {
             return ORDER_LIST_VIEW_PATH;
         }
         List<Driver> orderDrivers = driverService.getAllDriversOfOrder(order);
+        model.addAttribute("user", getPrincipal());
         model.addAttribute("order", order);
         model.addAttribute("driver", new Driver());
         model.addAttribute("orderDrivers", orderDrivers);
@@ -168,6 +180,18 @@ public class OrderController {
         return ORDER_LIST_VIEW_PATH;
     }
 
+    private String getPrincipal(){
+        String userName = null;
+        Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+
+        if (principal instanceof UserDetails) {
+            userName = ((UserDetails)principal).getUsername();
+        } else {
+            userName = principal.toString();
+        }
+        return userName;
+    }
+
     @ModelAttribute("cities")
     public List<City> cityList() throws TruckingServiceException{
         return cityService.findAllCities();
@@ -176,5 +200,12 @@ public class OrderController {
     @ModelAttribute("orderStatuses")
     public OrderStatus[] orderStatuses(){
         return OrderStatus.values();
+    }
+
+    @ModelAttribute("date")
+    public LocalDate currentDate(){
+        LocalDateTime localDate = LocalDateTime.ofInstant(new Date(System.currentTimeMillis()).toInstant(), ZoneId.systemDefault());
+        LocalDate toLocalDate = localDate.toLocalDate();
+        return toLocalDate;
     }
 }

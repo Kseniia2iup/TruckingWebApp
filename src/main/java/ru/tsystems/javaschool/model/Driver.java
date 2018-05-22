@@ -3,6 +3,7 @@ package ru.tsystems.javaschool.model;
 import ru.tsystems.javaschool.model.enums.DriverStatus;
 
 import javax.persistence.*;
+import java.util.Date;
 
 @Entity
 @Table(name = "drivers")
@@ -21,6 +22,14 @@ public class Driver {
     @Column(name = "worked_this_month", nullable = false)
     private Integer workedThisMonth;
 
+    @Temporal(TemporalType.TIMESTAMP)
+    @Column(name = "shift_begined")
+    private Date shiftBegined;
+
+    @Temporal(TemporalType.TIMESTAMP)
+    @Column(name = "shift_ended")
+    private Date shiftEnded;
+
     @Column(name = "phase_of_work", nullable = false)
     @Enumerated(EnumType.STRING)
     private DriverStatus status;
@@ -36,9 +45,6 @@ public class Driver {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "truck_id")
     private Truck currentTruck;
-
-    @OneToOne(mappedBy = "driver", fetch = FetchType.LAZY)
-    private OrderHistory history;
 
     @ManyToOne( fetch = FetchType.LAZY)
     @JoinColumn(name = "order_id")
@@ -79,6 +85,22 @@ public class Driver {
         this.workedThisMonth = workedThisMonth;
     }
 
+    public Date getShiftBegined() {
+        return shiftBegined;
+    }
+
+    public void setShiftBegined(Date shiftBegined) {
+        this.shiftBegined = shiftBegined;
+    }
+
+    public Date getShiftEnded() {
+        return shiftEnded;
+    }
+
+    public void setShiftEnded(Date shiftEnded) {
+        this.shiftEnded = shiftEnded;
+    }
+
     public DriverStatus getStatus() {
         return status;
     }
@@ -109,14 +131,6 @@ public class Driver {
 
     public void setUser(User user) {
         this.user = user;
-    }
-
-    public OrderHistory getHistory() {
-        return history;
-    }
-
-    public void setHistory(OrderHistory history) {
-        this.history = history;
     }
 
     public Order getOrder() {
