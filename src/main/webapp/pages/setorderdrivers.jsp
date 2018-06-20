@@ -61,7 +61,8 @@
         </c:choose>
         <h2>Add Drivers Form</h2>
         <form:form method="POST" modelAttribute="driver">
-
+            <c:choose>
+            <c:when test="${orderDrivers.size()<maxDrivers}">
             <div class="row">
                 <div class="form-group col-md-12">
                     <label class="col-md-3 control-lable" for="id">Choose driver</label>
@@ -75,6 +76,13 @@
             <div class="row">
                 <div class="form-actions floatRight">
                     <input type="submit" class="btn btn-primary btn-sm" value="Add Driver"/>
+                    </c:when>
+                    <c:otherwise>
+                    <div class="row">
+                        <div class="form-actions floatRight">
+
+                            </c:otherwise>
+                    </c:choose>
                     <c:choose>
                         <c:when test="${orderDrivers.size()!=0}">
                     <br/>
@@ -95,8 +103,9 @@
                 </div>
             </div>
         </form:form>
-    </div>
+    </div></div>
     </article>
+    </div>
 
     <!-- Sidebar -->
     <section id="sidebar">

@@ -39,7 +39,7 @@
             </header>
         <table class="table table-hover">
     <tr>
-        <td>REG NUMBER</td><td>CONDITION</td><td>SHIFT PERIOD</td><td>CAPACITY (TON)</td><td>CITY</td><td></td><td></td>
+        <td>REG NUMBER</td><td>CONDITION</td><td>MAX NUMBER OF DRIVERS</td><td>CAPACITY (TON)</td><td>CITY</td><td></td><td></td>
     </tr>
     <c:forEach items="${trucks}" var="truck">
         <tr>

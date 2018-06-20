@@ -63,11 +63,17 @@
                 <td>${truck.city.name}</td>
             </tr>
         </table>
-                </section>
                 <section>
             </c:when>
             <c:otherwise/>
         </c:choose>
+                <c:choose>
+                <c:when test="${overLimit==true}">
+                <p style="color: red">No driver will be able to complete this order because
+                    the time limit (176 hours per month) for a shift of a driver has exceeded.</p>
+                </c:when>
+                <c:otherwise/>
+                </c:choose>
         <c:choose>
             <c:when test="${order.orderStatus=='CREATED' || order.orderStatus=='INTERRUPTED'}">
                 <c:choose>

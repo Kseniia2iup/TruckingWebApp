@@ -100,7 +100,7 @@ public class DriverDaoImpl extends AbstractDao<Integer, Driver> implements Drive
             return (Integer)query.uniqueResult();
         }
         catch (Exception e){
-            LOGGER.warn("From DriverDaoImpl method getLastDriverId something went wrong:\n", e);
+            LOGGER.warn("From DriverDaoImpl method getMaxDriverId something went wrong:\n", e);
             throw new TruckingDaoException(e);
         }
     }
@@ -111,6 +111,7 @@ public class DriverDaoImpl extends AbstractDao<Integer, Driver> implements Drive
      * @return list of suitable drivers
      */
     @Override
+    @SuppressWarnings("unchecked")
     @Transactional(rollbackFor = TruckingDaoException.class,
             readOnly = true, propagation = Propagation.SUPPORTS)
     public List<Driver> getAllFreeDriversForTruck(Truck truck) throws TruckingDaoException {
@@ -129,6 +130,7 @@ public class DriverDaoImpl extends AbstractDao<Integer, Driver> implements Drive
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     @Transactional(rollbackFor = TruckingDaoException.class,
             readOnly = true, propagation = Propagation.SUPPORTS)
     public List<Driver> getAllDriversOfTruck(Truck truck) throws TruckingDaoException {
@@ -146,6 +148,7 @@ public class DriverDaoImpl extends AbstractDao<Integer, Driver> implements Drive
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     @Transactional(rollbackFor = TruckingDaoException.class,
             readOnly = true, propagation = Propagation.SUPPORTS)
     public List<Driver> getAllDriversOfOrder(Order order) throws TruckingDaoException {

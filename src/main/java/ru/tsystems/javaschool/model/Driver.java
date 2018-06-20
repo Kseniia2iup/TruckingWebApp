@@ -19,8 +19,11 @@ public class Driver {
     @Column(name = "surname", nullable = false)
     private String surname;
 
-    @Column(name = "worked_this_month", nullable = false)
+    @Column(name = "worked_this_month")
     private Integer workedThisMonth;
+
+    @Column(name = "e_mail")
+    private String email;
 
     @Temporal(TemporalType.TIMESTAMP)
     @Column(name = "shift_begined")
@@ -139,5 +142,13 @@ public class Driver {
 
     public void setOrder(Order order) {
         this.order = order;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
     }
 }

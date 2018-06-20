@@ -36,18 +36,11 @@ public class MainController {
     private static final String USER_LIST_VIEW_PATH = "redirect:/admin/listUsers";
     private static final String ADD_USER_VIEW_PATH = "newuser";
 
-    private MessageSource messageSource;
-
     private UserService userService;
 
     @Autowired
     public void setUserService(UserService userService) {
         this.userService = userService;
-    }
-
-    @Autowired
-    public void setMessageSource(MessageSource messageSource) {
-        this.messageSource = messageSource;
     }
 
     @GetMapping(path = {"/", "/home", "/welcome", "/index"})
@@ -59,7 +52,7 @@ public class MainController {
     @GetMapping(path = "/admin")
     public String adminPage(ModelMap model) {
         model.addAttribute("user", getPrincipal());
-        return "redirect:/admin/listUsers";
+        return USER_LIST_VIEW_PATH;
     }
 
     @GetMapping(path = "/manager")
@@ -89,7 +82,7 @@ public class MainController {
     }
 
 
-    @RequestMapping(value = { "/admin/listUsers" }, method = RequestMethod.GET)
+    @GetMapping(value = { "/admin/listUsers" })
     public String listUsers(ModelMap model) throws TruckingServiceException {
         List<User> users = userService.findAllUsers();
         model.addAttribute("currentUser", getPrincipal());
@@ -126,7 +119,7 @@ public class MainController {
         return "registrationsuccess";
     }
 
-    @RequestMapping(value = { "/admin/edit-user-{login}" }, method = RequestMethod.GET)
+    @GetMapping(value = { "/admin/edit-user-{login}" })
     public String editUser(@PathVariable String login, ModelMap model){
         User user = userService.findByLogin(login);
         model.addAttribute("currentUser", getPrincipal());
@@ -135,7 +128,7 @@ public class MainController {
         return ADD_USER_VIEW_PATH;
     }
 
-    @RequestMapping(value = { "/admin/edit-user-{login}" }, method = RequestMethod.POST)
+    @PostMapping(value = { "/admin/edit-user-{login}" })
     public String updateUser(@Valid User user, BindingResult result,
                              ModelMap model, @PathVariable String login)
             throws TruckingServiceException {
@@ -152,7 +145,7 @@ public class MainController {
         return "registrationsuccess";
     }
 
-    @RequestMapping(value = { "/admin/delete-user-{login}" }, method = RequestMethod.GET)
+    @GetMapping(value = { "/admin/delete-user-{login}" })
     public String deleteUser(@PathVariable String login) throws TruckingServiceException {
         userService.delete(userService.findByLogin(login).getId());
         return USER_LIST_VIEW_PATH;
@@ -186,8 +179,7 @@ public class MainController {
     @ModelAttribute("date")
     public LocalDate currentDate(){
         LocalDateTime localDate = LocalDateTime.ofInstant(new Date(System.currentTimeMillis()).toInstant(), ZoneId.systemDefault());
-        LocalDate toLocalDate = localDate.toLocalDate();
-        return toLocalDate;
+        return localDate.toLocalDate();
     }
 
 }

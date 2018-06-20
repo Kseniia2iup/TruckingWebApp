@@ -3,6 +3,8 @@ package ru.tsystems.javaschool.model;
 import ru.tsystems.javaschool.model.enums.CargoStatus;
 
 import javax.persistence.*;
+import javax.validation.constraints.Digits;
+import javax.validation.constraints.NotNull;
 
 @Entity
 @Table(name = "cargoes")
@@ -14,9 +16,11 @@ public class Cargo {
     private Integer id;
 
     @Column(name = "cargo_name", nullable = false)
+    @NotNull
     private String name;
 
     @Column(name = "weight_kg")
+    @NotNull
     private Integer weight;
 
     @Column(name = "delivery_status", nullable = false)

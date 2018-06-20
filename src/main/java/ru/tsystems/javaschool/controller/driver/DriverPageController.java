@@ -99,6 +99,9 @@ public class DriverPageController {
     @GetMapping(path = "driver/{id}/setStatus")
     public String setDriverStatus(@PathVariable Integer id, Model model)
             throws TruckingServiceException{
+        if(id!=userService.findByLogin(getPrincipal()).getId()){
+            return "redirect:/Access_Denied";
+        }
         model.addAttribute("driver", driverService.findDriverById(id));
         model.addAttribute("user", getPrincipal());
         return "setdriverstatus";
@@ -107,8 +110,12 @@ public class DriverPageController {
     @PostMapping(path = "driver/{id}/setStatus")
     public String saveDriverStatus(@PathVariable Integer id, Driver driver, Model model)
             throws TruckingServiceException{
+        if(id!=userService.findByLogin(getPrincipal()).getId()){
+            return "redirect:/Access_Denied";
+        }
         Driver entityDriver = driverService.findDriverById(id);
         driverService.setDriverStatus(entityDriver,driver.getStatus());
+        LOGGER.info("Driver {} has set new status", getPrincipal());
         return "redirect:/driver";
     }
 
@@ -116,6 +123,7 @@ public class DriverPageController {
     public String loadCargo(@PathVariable Integer id, Cargo cargo, Model model)
             throws TruckingServiceException, CargoAlreadyDeliveredException {
         cargoService.setCargoStatus(cargoService.findCargoById(id), CargoStatus.SHIPPED);
+        LOGGER.info("Driver {} has shipped cargo {}", getPrincipal(), cargo.getId());
         return "redirect:/driver";
     }
 
@@ -125,13 +133,15 @@ public class DriverPageController {
         String result =
                 cargoService.setCargoStatus(cargoService.findCargoById(id), CargoStatus.DELIVERED);
         if(result.equals("done")){
+            LOGGER.info("Driver {} has completed the order {}", getPrincipal(), cargo.getOrder().getId());
             return "redirect:/driver/orderisdone";
         }
+        LOGGER.info("Driver {} has delivered cargo {}", getPrincipal(), cargo.getId());
         return "redirect:/driver";
     }
 
     @GetMapping(path = "driver/orderisdone")
-    public String showOrderIsDonSuccessPage(Model model){
+    public String showOrderIsDonSuccessPage(Model model) {
         model.addAttribute("message", "Order is successfully done!" +
                     "\n Thank you!");
         model.addAttribute("user", getPrincipal());
@@ -140,7 +150,12 @@ public class DriverPageController {
 
     @GetMapping(path = "driver/{id}/truckIsBroken")
     public String truckIsBroken(@PathVariable Integer id, Model model) throws TruckingServiceException{
-        truckService.markTruckAsBrokenWhileOrder(driverService.findDriverById(id).getCurrentTruck().getId());
+        if(id!=userService.findByLogin(getPrincipal()).getId()){
+            return "redirect:/Access_Denied";
+        }
+        Integer truckId = driverService.findDriverById(id).getCurrentTruck().getId();
+        truckService.markTruckAsBrokenWhileOrder(truckId);
+        LOGGER.info("{}'s truck {} has broken", getPrincipal(), truckId);
         return "redirect:/driver";
     }
 
@@ -169,7 +184,6 @@ public class DriverPageController {
     @ModelAttribute("date")
     public LocalDate currentDate(){
         LocalDateTime localDate = LocalDateTime.ofInstant(new Date(System.currentTimeMillis()).toInstant(), ZoneId.systemDefault());
-        LocalDate toLocalDate = localDate.toLocalDate();
-        return toLocalDate;
+        return localDate.toLocalDate();
     }
 }

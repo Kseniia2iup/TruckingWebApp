@@ -47,24 +47,33 @@
             <label class="col-md-3 control-lable" for="reg_number">Registration number</label>
             <div class="col-md-7">
                 <form:input type="text" path="regNumber" id="reg_number" placeholder="AA00000" class="form-control input-sm"/>
+                <div class="has-error">
+                    <form:errors path="regNumber" class="help-inline"/>
+                </div>
             </div>
         </div>
     </div>
 
     <div class="row">
         <div class="form-group col-md-12">
-            <label class="col-md-3 control-lable" for="shift_period">Shift Period</label>
+            <label class="col-md-3 control-lable" for="shift_period">Max number of drivers</label>
             <div class="col-md-7">
                 <form:input type="text" path="shiftPeriod" id="shift_period" class="form-control input-sm"/>
+                <div class="has-error">
+                    <form:errors path="shiftPeriod" class="help-inline"/>
+                </div>
             </div>
         </div>
     </div>
 
     <div class="row">
         <div class="form-group col-md-12">
-            <label class="col-md-3 control-lable" for="capacity">Capacity</label>
+            <label class="col-md-3 control-lable" for="capacity">Capacity (ton)</label>
             <div class="col-md-7">
-                <form:input type="text" path="capacityTon" id="capacity" class="form-control input-sm"/>
+                <form:input type="text" path="capacityTon" id="capacity" placeholder="ton" class="form-control input-sm"/>
+                <div class="has-error">
+                    <form:errors path="capacityTon" class="help-inline"/>
+                </div>
             </div>
         </div>
     </div>

@@ -17,9 +17,13 @@ public interface OrderService {
 
     List<Order> findAllOrders() throws TruckingServiceException;
 
+    List<Order> findLastTenOrders() throws TruckingServiceException;
+
     Double calculateSumDistanceOfOrder(Order order) throws TruckingServiceException;
 
     Integer averageTimeInHoursForOrder(Order order) throws TruckingServiceException;
+
+    boolean isTimeOrderExceedsDriversShiftLimit(Order order) throws TruckingServiceException;
 
     void removeTruckAndDriversFromOrder(Order order) throws TruckingServiceException;
 }

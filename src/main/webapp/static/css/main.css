@@ -3231,6 +3231,9 @@
 		-ms-flex: 1;
 		width: 100%;
 	}
+	.has-error{
+		color: crimson;
+	}
 
 	/* Buttons */
 .btn-success{

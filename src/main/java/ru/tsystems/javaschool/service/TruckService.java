@@ -1,7 +1,6 @@
 package ru.tsystems.javaschool.service;
 
 import ru.tsystems.javaschool.exceptions.NoCargoInTheOrderException;
-import ru.tsystems.javaschool.exceptions.TruckingDaoException;
 import ru.tsystems.javaschool.exceptions.TruckingServiceException;
 import ru.tsystems.javaschool.model.Order;
 import ru.tsystems.javaschool.model.Truck;
@@ -30,4 +29,8 @@ public interface TruckService {
             throws TruckingServiceException, NoCargoInTheOrderException;
 
     void markTruckAsBrokenWhileOrder(Integer id) throws TruckingServiceException;
+
+    List<Truck> findAllBrokenTrucks(List<Truck> allTrucks) throws TruckingServiceException;
+
+    List<Truck> findAllTrucksOnOrder(List<Truck> allTrucks) throws TruckingServiceException;
 }

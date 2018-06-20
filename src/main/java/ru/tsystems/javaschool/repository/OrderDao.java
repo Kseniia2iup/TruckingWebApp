@@ -18,4 +18,6 @@ public interface OrderDao {
     List<Order> findAllOrders() throws TruckingDaoException;
 
     boolean isTruckHasOrder(Integer truckId) throws TruckingDaoException;
+
+    List<Order> findLastTenOrders() throws TruckingDaoException;
 }

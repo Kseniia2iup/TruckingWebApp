@@ -14,10 +14,7 @@ import ru.tsystems.javaschool.model.Truck;
 import ru.tsystems.javaschool.model.enums.CargoStatus;
 import ru.tsystems.javaschool.model.enums.OrderStatus;
 import ru.tsystems.javaschool.repository.CargoDao;
-import ru.tsystems.javaschool.service.CargoService;
-import ru.tsystems.javaschool.service.CityService;
-import ru.tsystems.javaschool.service.OrderService;
-import ru.tsystems.javaschool.service.TruckService;
+import ru.tsystems.javaschool.service.*;
 
 import java.util.List;
 
@@ -34,6 +31,13 @@ public class CargoServiceImpl implements CargoService {
     private TruckService truckService;
 
     private CityService cityService;
+
+    private InfoBoardService infoBoardService;
+
+    @Autowired
+    public void setInfoBoardService(InfoBoardService infoBoardService) {
+        this.infoBoardService = infoBoardService;
+    }
 
     @Autowired
     public void setCityService(CityService cityService) {
@@ -70,6 +74,7 @@ public class CargoServiceImpl implements CargoService {
     public void deleteCargo(Integer id) throws TruckingServiceException {
         try {
             cargoDao.deleteCargo(id);
+            infoBoardService.sendInfoToQueue();
         }
         catch (Exception e){
             LOGGER.warn("Something went wrong\n", e);
@@ -81,6 +86,7 @@ public class CargoServiceImpl implements CargoService {
     public void saveCargo(Cargo cargo) throws TruckingServiceException {
         try {
             cargoDao.saveCargo(cargo);
+            infoBoardService.sendInfoToQueue();
         }
         catch (Exception e){
             LOGGER.warn("Something went wrong\n", e);
@@ -92,6 +98,7 @@ public class CargoServiceImpl implements CargoService {
     public void updateCargo(Cargo cargo) throws TruckingServiceException {
         try {
             cargoDao.updateCargo(cargo);
+            infoBoardService.sendInfoToQueue();
         }
         catch (Exception e){
             LOGGER.warn("Something went wrong\n", e);

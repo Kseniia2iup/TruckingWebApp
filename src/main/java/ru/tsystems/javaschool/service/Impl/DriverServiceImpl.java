@@ -12,6 +12,7 @@ import ru.tsystems.javaschool.model.Truck;
 import ru.tsystems.javaschool.model.enums.DriverStatus;
 import ru.tsystems.javaschool.repository.DriverDao;
 import ru.tsystems.javaschool.service.DriverService;
+import ru.tsystems.javaschool.service.InfoBoardService;
 import ru.tsystems.javaschool.service.OrderService;
 import ru.tsystems.javaschool.service.UserService;
 
@@ -21,6 +22,10 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Random;
+import java.util.*;
+import javax.mail.*;
+import javax.mail.internet.*;
+import javax.activation.*;
 
 @Service("driverService")
 @Transactional
@@ -33,6 +38,13 @@ public class DriverServiceImpl implements DriverService {
     private DriverDao driverDao;
 
     private OrderService orderService;
+
+    private InfoBoardService infoBoardService;
+
+    @Autowired
+    public void setInfoBoardService(InfoBoardService infoBoardService) {
+        this.infoBoardService = infoBoardService;
+    }
 
     @Autowired
     public void setOrderService(OrderService orderService) {
@@ -64,8 +76,8 @@ public class DriverServiceImpl implements DriverService {
     @Override
     public void deleteDriver(Integer id) throws TruckingServiceException {
         try {
-            Driver driver = findDriverById(id);
             driverDao.deleteDriver(id);
+            infoBoardService.sendInfoToQueue();
         }
         catch (Exception e){
             LOGGER.warn("Something went wrong\n", e);
@@ -77,6 +89,7 @@ public class DriverServiceImpl implements DriverService {
     public void saveDriver(Driver driver) throws TruckingServiceException {
         try {
             driverDao.saveDriver(driver);
+            infoBoardService.sendInfoToQueue();
         }
         catch (Exception e){
             LOGGER.warn("Something went wrong\n", e);
@@ -88,6 +101,7 @@ public class DriverServiceImpl implements DriverService {
     public void updateDriver(Driver driver) throws TruckingServiceException {
         try {
             driverDao.updateDriver(driver);
+            infoBoardService.sendInfoToQueue();
         }
         catch (Exception e){
             LOGGER.warn("Something went wrong\n", e);
@@ -107,7 +121,7 @@ public class DriverServiceImpl implements DriverService {
     }
 
     @Override
-    public Integer getLastDriverId() throws TruckingServiceException {
+    public Integer getMaxDriverId() throws TruckingServiceException {
         try {
             return driverDao.getLastDriverId();
         }
@@ -126,20 +140,20 @@ public class DriverServiceImpl implements DriverService {
     public String generateDriverLogin(Driver driver) throws TruckingServiceException {
         try {
             Random random = new Random();
-            Integer lastDriverId = getLastDriverId();
-            if (lastDriverId == null) {
-                lastDriverId = 1;
+            Integer maxDriverId = getMaxDriverId();
+            if (maxDriverId == null) {
+                maxDriverId = 1;
             }
-            String result = driver.getName()
+            String result = driver.getSurname()
                     + '_'
-                    + lastDriverId
+                    + maxDriverId
                     + random.nextInt(1000);
             while (!userService.isUserLoginUnique(result)) {
                 StringBuilder stringBuilder = new StringBuilder(result);
                 stringBuilder.append(random.nextInt(9));
                 result = stringBuilder.toString();
             }
-            //System.out.println("------------" + result + "------------");
+
             return result;
         }
         catch (Exception e){
@@ -159,10 +173,9 @@ public class DriverServiceImpl implements DriverService {
         for (int i = 0; i < 5; i++) {
             result.append(random.nextInt(10));
             result.append((char) (random.nextInt(26) + 65));
-            result.append((char) (random.nextInt(26) + 96));
+            result.append((char) (random.nextInt(26) + 97));
         }
 
-        //System.out.println("------------" + result + "------------");
         return result.toString();
     }
 
@@ -236,7 +249,7 @@ public class DriverServiceImpl implements DriverService {
                 }
                 return drivers;
             }
-            return null;
+            return new ArrayList<>();
         }
         catch (Exception e){
             LOGGER.warn("Something went wrong\n", e);
@@ -256,41 +269,123 @@ public class DriverServiceImpl implements DriverService {
     @Override
     public void setDriverStatus(Driver driver, DriverStatus newStatus) throws TruckingServiceException {
         try {
-            DriverStatus oldStatus = driver.getStatus();
-
-            if (oldStatus.equals(DriverStatus.REST) && !newStatus.equals(DriverStatus.REST)) {
-                driver.setShiftBegined(new Date(System.currentTimeMillis()));
-
-                driver.setStatus(newStatus);
-                updateDriver(driver);
-            }
-
-            //If Driver has ended shift add new hours of work to workedThisMonth field
-            else if (!oldStatus.equals(DriverStatus.REST) && newStatus.equals(DriverStatus.REST)) {
-                driver.setShiftEnded(new Date(System.currentTimeMillis()));
-
-                LocalDateTime shiftBegan = LocalDateTime.ofInstant(
-                        driver.getShiftBegined().toInstant(), ZoneId.systemDefault());
-                LocalDateTime shiftEnded = LocalDateTime.ofInstant(
-                        driver.getShiftEnded().toInstant(), ZoneId.systemDefault());
-
-                if (shiftBegan.getMonthValue() != shiftEnded.getMonthValue()) {
-                    driver.setWorkedThisMonth(shiftEnded.getDayOfMonth() * 24 + shiftEnded.getHour());
-                } else {
-                    driver.setWorkedThisMonth((shiftEnded.getDayOfMonth() - shiftBegan.getDayOfMonth())
-                            * 24 + shiftEnded.getHour() - shiftBegan.getHour());
-                }
-
-                driver.setStatus(newStatus);
-                updateDriver(driver);
-            } else {
-                driver.setStatus(newStatus);
-                updateDriver(driver);
-            }
+            updateDriver(setHoursOfWorkDependsOnStatusChanging(driver, newStatus));
+            infoBoardService.sendInfoToQueue();
         }
         catch (Exception e){
             LOGGER.warn("Something went wrong\n", e);
             throw new TruckingServiceException(e);
         }
+    }
+
+    @Override
+    public Driver setHoursOfWorkDependsOnStatusChanging(Driver driver, DriverStatus newStatus)
+            throws TruckingServiceException{
+        try {
+        DriverStatus oldStatus = driver.getStatus();
+
+        if (oldStatus.equals(DriverStatus.REST) && !newStatus.equals(DriverStatus.REST)) {
+            driver.setShiftBegined(new Date(System.currentTimeMillis()));
+            driver.setStatus(newStatus);
+            return (driver);
+        }
+
+        //If Driver has ended shift add new hours of work to workedThisMonth field
+        else if (!oldStatus.equals(DriverStatus.REST) && newStatus.equals(DriverStatus.REST)) {
+            driver.setShiftEnded(new Date(System.currentTimeMillis()));
+
+            LocalDateTime shiftBegan = LocalDateTime.ofInstant(
+                    driver.getShiftBegined().toInstant(), ZoneId.systemDefault());
+            LocalDateTime shiftEnded = LocalDateTime.ofInstant(
+                    driver.getShiftEnded().toInstant(), ZoneId.systemDefault());
+
+            if (shiftBegan.getMonthValue() != shiftEnded.getMonthValue()) {
+                driver.setWorkedThisMonth(shiftEnded.getDayOfMonth() * 24 + shiftEnded.getHour());
+            } else {
+                driver.setWorkedThisMonth((shiftEnded.getDayOfMonth() - shiftBegan.getDayOfMonth())
+                        * 24 + shiftEnded.getHour() - shiftBegan.getHour());
+            }
+
+            driver.setStatus(newStatus);
+            return (driver);
+        } else {
+            driver.setStatus(newStatus);
+            return (driver);
+        }
+    }
+        catch (Exception e){
+        LOGGER.warn("Something went wrong\n", e);
+        throw new TruckingServiceException(e);
+    }
+    }
+
+    @Override
+    public List<Driver> findAllFreeDrivers(List<Driver> allDrivers) throws TruckingServiceException {
+        try {
+            if (allDrivers==null){
+                return new ArrayList<>();
+            }
+
+            List<Driver> result = new ArrayList<>();
+            for (Driver driver: allDrivers
+                 ) {
+                if (driver.getCurrentTruck()!=null){
+                    result.add(driver);
+                }
+            }
+            return result;
+        }
+        catch (Exception e){
+            LOGGER.warn("Something went wrong\n", e);
+            throw new TruckingServiceException(e);
+        }
+    }
+
+    @Override
+    public void sendSuccessRegistrationEmail(String email, String login, String password)
+            throws TruckingServiceException {
+
+        // Recipient's email ID needs to be mentioned.
+        String to = email;
+
+        // Sender's email ID needs to be mentioned
+        String from = "kseniia.iup@gmail.com";
+
+        // Assuming you are sending email from localhost
+        String host = "localhost";
+
+        // Get system properties
+        Properties properties = System.getProperties();
+
+        // Setup mail server
+        properties.setProperty("mail.smtp.host", host);
+
+        // Get the default Session object.
+        Session session = Session.getDefaultInstance(properties);
+
+        try {
+            // Create a default MimeMessage object.
+            MimeMessage message = new MimeMessage(session);
+
+            // Set From: header field of the header.
+            message.setFrom(new InternetAddress(from));
+
+            // Set To: header field of the header.
+            message.addRecipient(Message.RecipientType.TO, new InternetAddress(to));
+
+            // Set Subject: header field
+            message.setSubject("Registration on LogiWeb");
+
+            // Send the actual HTML message, as big as you like
+            message.setContent("<h1>Your login and password: </h1> <br/> <b>"
+                    + login + " " + password + "</b>", "text/html");
+
+            // Send message
+            Transport.send(message);
+        } catch (Exception e) {
+            LOGGER.warn("Something went wrong\n", e);
+            throw new TruckingServiceException(e);
+        }
+
     }
 }

@@ -10,9 +10,7 @@ import ru.tsystems.javaschool.model.*;
 import ru.tsystems.javaschool.model.enums.CargoStatus;
 import ru.tsystems.javaschool.model.enums.DriverStatus;
 import ru.tsystems.javaschool.repository.*;
-import ru.tsystems.javaschool.service.CityService;
-import ru.tsystems.javaschool.service.OrderService;
-import ru.tsystems.javaschool.service.WaypointService;
+import ru.tsystems.javaschool.service.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -29,9 +27,18 @@ public class OrderServiceImpl implements OrderService {
 
     private DriverDao driverDao;
 
+    private DriverService driverService;
+
     private TruckDao truckDao;
 
     private WaypointService waypointService;
+
+    private InfoBoardService infoBoardService;
+
+    @Autowired
+    public void setInfoBoardService(InfoBoardService infoBoardService) {
+        this.infoBoardService = infoBoardService;
+    }
 
     @Autowired
     public void setWaypointService(WaypointService waypointService) {
@@ -46,6 +53,11 @@ public class OrderServiceImpl implements OrderService {
     @Autowired
     public void setDriverDao(DriverDao driverDao) {
         this.driverDao = driverDao;
+    }
+
+    @Autowired
+    public void setDriverService(DriverService driverService) {
+        this.driverService = driverService;
     }
 
     @Autowired
@@ -64,7 +76,7 @@ public class OrderServiceImpl implements OrderService {
             return orderDao.findOrderById(id);
         }
         catch (Exception e){
-            LOGGER.warn("Something went wrong\n", e);
+            LOGGER.warn("Something went wrong in the OrderServiceImpl\n", e);
             throw new TruckingServiceException(e);
         }
     }
@@ -74,9 +86,10 @@ public class OrderServiceImpl implements OrderService {
         try {
             removeTruckAndDriversFromOrder(findOrderById(id));
             orderDao.deleteOrder(id);
+            infoBoardService.sendInfoToQueue();
         }
         catch (Exception e){
-            LOGGER.warn("Something went wrong\n", e);
+            LOGGER.warn("Something went wrong in the OrderServiceImpl\n", e);
             throw new TruckingServiceException(e);
         }
     }
@@ -85,9 +98,10 @@ public class OrderServiceImpl implements OrderService {
     public void saveOrder(Order order) throws TruckingServiceException {
         try {
             orderDao.saveOrder(order);
+            infoBoardService.sendInfoToQueue();
         }
         catch (Exception e){
-            LOGGER.warn("Something went wrong\n", e);
+            LOGGER.warn("Something went wrong in the OrderServiceImpl\n", e);
             throw new TruckingServiceException(e);
         }
     }
@@ -96,9 +110,10 @@ public class OrderServiceImpl implements OrderService {
     public void updateOrder(Order order) throws TruckingServiceException {
         try {
             orderDao.updateOrder(order);
+            infoBoardService.sendInfoToQueue();
         }
         catch (Exception e){
-            LOGGER.warn("Something went wrong\n", e);
+            LOGGER.warn("Something went wrong in the OrderServiceImpl\n", e);
             throw new TruckingServiceException(e);
         }
     }
@@ -109,7 +124,18 @@ public class OrderServiceImpl implements OrderService {
             return orderDao.findAllOrders();
         }
         catch (Exception e){
-            LOGGER.warn("Something went wrong\n", e);
+            LOGGER.warn("Something went wrong in the OrderServiceImpl\n", e);
+            throw new TruckingServiceException(e);
+        }
+    }
+
+    @Override
+    public List<Order> findLastTenOrders() throws TruckingServiceException {
+        try {
+            return orderDao.findLastTenOrders();
+        }
+        catch (Exception e){
+            LOGGER.warn("Something went wrong in the OrderServiceImpl\n", e);
             throw new TruckingServiceException(e);
         }
     }
@@ -123,12 +149,18 @@ public class OrderServiceImpl implements OrderService {
     public Double calculateSumDistanceOfOrder(Order order) throws TruckingServiceException {
         try {
             List<Waypoint> waypoints = waypointService.findAllWaypointsByOrderId(order.getId());
+            if (waypoints.isEmpty()){
+                return 0d;
+            }
             List<Waypoint> waypointsWithNotDeliveredCargoes = new ArrayList<>();
             for (Waypoint wp : waypoints
                     ) {
                 if (!wp.getCargo().getDelivery_status().equals(CargoStatus.DELIVERED)) {
                     waypointsWithNotDeliveredCargoes.add(wp);
                 }
+            }
+            if(waypointsWithNotDeliveredCargoes.isEmpty()){
+                return 0d;
             }
             Double sumDistance = 0d;
             City cityA;
@@ -147,7 +179,7 @@ public class OrderServiceImpl implements OrderService {
             return sumDistance;
         }
         catch (Exception e){
-            LOGGER.warn("Something went wrong\n", e);
+            LOGGER.warn("Something went wrong in the OrderServiceImpl\n", e);
             throw new TruckingServiceException(e);
         }
     }
@@ -176,10 +208,22 @@ public class OrderServiceImpl implements OrderService {
                     + (int) Math.round(averageTimeOfDrivingInHours);
         }
         catch (Exception e){
-            LOGGER.warn("Something went wrong\n", e);
+            LOGGER.warn("Something went wrong in the OrderServiceImpl\n", e);
             throw new TruckingServiceException(e);
         }
 
+    }
+
+    @Override
+    public boolean isTimeOrderExceedsDriversShiftLimit(Order order) throws TruckingServiceException {
+        try {
+            Integer timeForOrder = averageTimeInHoursForOrder(order);
+            return timeForOrder > 176;
+        }
+        catch (Exception e){
+            LOGGER.warn("Something went wrong in the OrderServiceImpl\n", e);
+            throw new TruckingServiceException(e);
+        }
     }
 
     @Override
@@ -194,7 +238,7 @@ public class OrderServiceImpl implements OrderService {
                             ) {
                         driver.setCurrentTruck(null);
                         driver.setOrder(null);
-                        driver.setStatus(DriverStatus.REST);
+                        driverService.setDriverStatus(driver, DriverStatus.REST);
                         driverDao.updateDriver(driver);
                     }
                 }
@@ -202,10 +246,11 @@ public class OrderServiceImpl implements OrderService {
                 truckDao.updateTruck(truck);
                 entityOrder.setTruck(null);
                 orderDao.updateOrder(entityOrder);
+                infoBoardService.sendInfoToQueue();
             }
         }
         catch (Exception e){
-            LOGGER.warn("Something went wrong\n", e);
+            LOGGER.warn("Something went wrong in the OrderServiceImpl\n", e);
             throw new TruckingServiceException(e);
         }
     }

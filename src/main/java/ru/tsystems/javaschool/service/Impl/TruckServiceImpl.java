@@ -16,6 +16,7 @@ import ru.tsystems.javaschool.model.enums.TruckStatus;
 import ru.tsystems.javaschool.repository.CargoDao;
 import ru.tsystems.javaschool.repository.OrderDao;
 import ru.tsystems.javaschool.repository.TruckDao;
+import ru.tsystems.javaschool.service.InfoBoardService;
 import ru.tsystems.javaschool.service.OrderService;
 import ru.tsystems.javaschool.service.TruckService;
 
@@ -37,6 +38,13 @@ public class TruckServiceImpl implements TruckService {
     private OrderService orderService;
 
     private CargoDao cargoDao;
+
+    private InfoBoardService infoBoardService;
+
+    @Autowired
+    public void setInfoBoardService(InfoBoardService infoBoardService) {
+        this.infoBoardService = infoBoardService;
+    }
 
     @Autowired
     public void setCargoDao(CargoDao cargoDao) {
@@ -84,6 +92,7 @@ public class TruckServiceImpl implements TruckService {
     public void saveTruck(Truck truck) throws TruckingServiceException {
         try {
             truckDao.saveTruck(truck);
+            infoBoardService.sendInfoToQueue();
         }
         catch (Exception e){
             LOGGER.warn("Something went wrong\n", e);
@@ -95,6 +104,7 @@ public class TruckServiceImpl implements TruckService {
     public void deleteTruckByRegNumber(String regNumber) throws TruckingServiceException {
         try {
             truckDao.deleteTruckByRegNumber(regNumber);
+            infoBoardService.sendInfoToQueue();
         }
         catch (Exception e){
             LOGGER.warn("Something went wrong\n", e);
@@ -117,6 +127,7 @@ public class TruckServiceImpl implements TruckService {
     public void updateTruck(Truck truck) throws TruckingServiceException {
         try {
             truckDao.updateTruck(truck);
+            infoBoardService.sendInfoToQueue();
         }
         catch (Exception e){
             LOGGER.warn("Something went wrong\n", e);
@@ -208,6 +219,52 @@ public class TruckServiceImpl implements TruckService {
 
             entityTruck.setCondition(TruckStatus.FAULTY);
             truckDao.updateTruck(entityTruck);
+        }
+        catch (Exception e){
+            LOGGER.warn("Something went wrong\n", e);
+            throw new TruckingServiceException(e);
+        }
+    }
+
+    @Override
+    public List<Truck> findAllBrokenTrucks(List<Truck> allTrucks) throws TruckingServiceException {
+        try {
+            if(allTrucks==null){
+                return new ArrayList<>();
+            }
+
+            List<Truck> result = new ArrayList<>();
+
+            for (Truck truck: allTrucks
+                 ) {
+                if(truck.getCondition().equals(TruckStatus.FAULTY)){
+                    result.add(truck);
+                }
+            }
+            return result;
+        }
+        catch (Exception e){
+            LOGGER.warn("Something went wrong\n", e);
+            throw new TruckingServiceException(e);
+        }
+    }
+
+    @Override
+    public List<Truck> findAllTrucksOnOrder(List<Truck> allTrucks) throws TruckingServiceException {
+        try {
+            if(allTrucks==null){
+                return new ArrayList<>();
+            }
+
+            List<Truck> result = new ArrayList<>();
+
+            for (Truck truck: allTrucks
+                    ) {
+                if(truck.getOrder()!=null){
+                    result.add(truck);
+                }
+            }
+            return result;
         }
         catch (Exception e){
             LOGGER.warn("Something went wrong\n", e);

@@ -1,10 +1,14 @@
 package ru.tsystems.javaschool.controller.manager;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.MessageSource;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -15,6 +19,7 @@ import ru.tsystems.javaschool.model.*;
 import ru.tsystems.javaschool.model.enums.CargoStatus;
 import ru.tsystems.javaschool.model.enums.OrderStatus;
 import ru.tsystems.javaschool.service.*;
+import ru.tsystems.javaschool.validator.CargoValidator;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -25,31 +30,64 @@ import java.util.List;
 @Controller
 public class OrderController {
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(OrderController.class);
+
     private static final String ORDER_LIST_VIEW_PATH = "redirect:/manager/listOrders";
     private static final String ADD_ORDER_VIEW_PATH = "allcargoes";
 
-    @Autowired
-    OrderService orderService;
+    private OrderService orderService;
+
+    private CargoService cargoService;
+
+    private WaypointService waypointService;
+
+    private CityService cityService;
+
+    private TruckService truckService;
+
+    private DriverService driverService;
+
+    private CargoValidator cargoValidator;
 
     @Autowired
-    CargoService cargoService;
+    public void setCargoValidator(CargoValidator cargoValidator) {
+        this.cargoValidator = cargoValidator;
+    }
 
     @Autowired
-    WaypointService waypointService;
+    public void setOrderService(OrderService orderService) {
+        this.orderService = orderService;
+    }
 
     @Autowired
-    CityService cityService;
+    public void setCargoService(CargoService cargoService) {
+        this.cargoService = cargoService;
+    }
 
     @Autowired
-    TruckService truckService;
+    public void setWaypointService(WaypointService waypointService) {
+        this.waypointService = waypointService;
+    }
 
     @Autowired
-    DriverService driverService;
+    public void setCityService(CityService cityService) {
+        this.cityService = cityService;
+    }
+
+    @Autowired
+    public void setTruckService(TruckService truckService) {
+        this.truckService = truckService;
+    }
+
+    @Autowired
+    public void setDriverService(DriverService driverService) {
+        this.driverService = driverService;
+    }
 
     @GetMapping(path = "manager/listOrders")
     public String listOfOrders(Model model) throws TruckingServiceException {
         model.addAttribute("orders", orderService.findAllOrders());
-        model.addAttribute("user", getPrincipal());
+        LOGGER.info("Manager {} looks on the orders list", getPrincipal());
         return "allorders";
     }
 
@@ -59,21 +97,27 @@ public class OrderController {
         order.setOrderStatus(OrderStatus.CREATED);
         orderService.saveOrder(order);
         model.addAttribute("order", orderService.findOrderById(order.getId()));
-        model.addAttribute("user", getPrincipal());
+        LOGGER.info("Manager {} has created order with id = {}", getPrincipal(), order.getId());
         return "redirect:/manager/"+order.getId()+"/listOrderCargoes";
     }
 
     @GetMapping(path = "manager/{orderId}/listOrderCargoes")
     public String listCargoes(@PathVariable Integer orderId, Model model) throws TruckingServiceException {
         Order order = orderService.findOrderById(orderId);
+        List<Cargo> cargoes = cargoService.findAllCargoesOfOrder(orderId);
         Truck truck = null;
         if(order.getTruck()!=null){
             truck = truckService.findTruckById(order.getTruck().getId());
         }
+        if (orderService.isTimeOrderExceedsDriversShiftLimit(order)){
+            model.addAttribute("overLimit", true);
+        }
+        else {
+            model.addAttribute("overLimit", false);
+        }
         model.addAttribute("order", order);
         model.addAttribute("truck", truck);
-        model.addAttribute("cargoes", cargoService.findAllCargoesOfOrder(orderId));
-        model.addAttribute("user", getPrincipal());
+        model.addAttribute("cargoes", cargoes);
         return ADD_ORDER_VIEW_PATH;
     }
 
@@ -84,16 +128,24 @@ public class OrderController {
                 orderService.findOrderById(orderId).getOrderStatus() != OrderStatus.CREATED){
             return ORDER_LIST_VIEW_PATH;
         }
-        model.addAttribute("user", getPrincipal());
         model.addAttribute("order", orderService.findOrderById(orderId));
         model.addAttribute("cargo", new Cargo());
         return "newcargo";
     }
 
     @PostMapping(path = "manager/{orderId}/newCargo")
-    public String saveCargo(@PathVariable Integer orderId, Cargo cargo, Model model)
+    public String saveCargo(@PathVariable Integer orderId, Cargo cargo, BindingResult result, Model model)
             throws TruckingServiceException{
-        model.addAttribute("order", orderService.findOrderById(orderId));
+
+        cargoValidator.validate(cargo, result);
+
+        if(result.hasErrors()){
+            model.addAttribute("order", orderService.findOrderById(orderId));
+            model.addAttribute("cargo", new Cargo());
+            LOGGER.info("Manager {} has tried to create the cargo but entered incorrect data", getPrincipal());
+            return "newcargo";
+        }
+
         Order order = orderService.findOrderById(orderId);
         cargo.setOrder(order);
         cargo.setDelivery_status(CargoStatus.PREPARED);
@@ -104,7 +156,17 @@ public class OrderController {
         waypoint.setCityDep(cargo.getWaypoint().getCityDep());
         waypoint.setCityDest(cargo.getWaypoint().getCityDest());
         waypointService.saveWaypoint(waypoint);
+
+        model.addAttribute("order", orderService.findOrderById(orderId));
+        LOGGER.info("Manager {} has added the cargo with id = {} to the order with id = {}",
+                getPrincipal(), cargo.getId(), order.getId());
         return "redirect:/manager/"+orderId+"/listOrderCargoes";
+    }
+
+    @GetMapping(path = "manager/{id}/deleteCargo")
+    public String deleteCargo(@PathVariable Integer id, Model model)
+            throws TruckingServiceException {
+        return "";
     }
 
     @GetMapping(path = "manager/{id}/setOrderTruck")
@@ -117,7 +179,6 @@ public class OrderController {
             return ORDER_LIST_VIEW_PATH;
         }
         orderService.removeTruckAndDriversFromOrder(order);
-        model.addAttribute("user", getPrincipal());
         model.addAttribute("order", order);
         model.addAttribute("trucks",
                 truckService.findAllTrucksReadyForOrder(order));
@@ -133,6 +194,8 @@ public class OrderController {
                 truckService.findAllTrucksReadyForOrder(entityOrder));
         entityOrder.setTruck(order.getTruck());
         orderService.updateOrder(entityOrder);
+        LOGGER.info("Manager {} has added the truck with id = {} to the order with id = {}",
+                getPrincipal(), order.getTruck().getId(), order.getId());
         return "redirect:/manager/"+id+"/setOrderDrivers";
     }
 
@@ -146,7 +209,7 @@ public class OrderController {
             return ORDER_LIST_VIEW_PATH;
         }
         List<Driver> orderDrivers = driverService.getAllDriversOfOrder(order);
-        model.addAttribute("user", getPrincipal());
+        model.addAttribute("maxDrivers", order.getTruck().getShiftPeriod());
         model.addAttribute("order", order);
         model.addAttribute("driver", new Driver());
         model.addAttribute("orderDrivers", orderDrivers);
@@ -162,6 +225,8 @@ public class OrderController {
         driver.setOrder(entityOrder);
         driver.setCurrentTruck(entityOrder.getTruck());
         driverService.updateDriver(driver);
+        LOGGER.info("Manager {} has added the driver with id = {} to the order with id = {}",
+                getPrincipal(), newDriver.getId(), id);
         return "redirect:/manager/"+id+"/setOrderDrivers";
     }
 
@@ -177,9 +242,11 @@ public class OrderController {
         }
         order.setOrderStatus(OrderStatus.IN_PROCESS);
         orderService.updateOrder(order);
+        LOGGER.info("Manager {} has completed order with id = {}", getPrincipal(), order.getId());
         return ORDER_LIST_VIEW_PATH;
     }
 
+    @ModelAttribute("user")
     private String getPrincipal(){
         String userName = null;
         Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
@@ -205,7 +272,6 @@ public class OrderController {
     @ModelAttribute("date")
     public LocalDate currentDate(){
         LocalDateTime localDate = LocalDateTime.ofInstant(new Date(System.currentTimeMillis()).toInstant(), ZoneId.systemDefault());
-        LocalDate toLocalDate = localDate.toLocalDate();
-        return toLocalDate;
+        return localDate.toLocalDate();
     }
 }

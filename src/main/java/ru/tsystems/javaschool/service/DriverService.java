@@ -20,7 +20,7 @@ public interface DriverService {
 
     List<Driver> findAllDrivers() throws TruckingServiceException;
 
-    Integer getLastDriverId() throws TruckingServiceException;
+    Integer getMaxDriverId() throws TruckingServiceException;
 
     String generateDriverLogin(Driver driver) throws TruckingServiceException;
 
@@ -35,4 +35,10 @@ public interface DriverService {
     List<Driver> findCoWorkers(Driver driver) throws TruckingServiceException;
 
     void setDriverStatus(Driver driver, DriverStatus newStatus) throws TruckingServiceException;
+
+    Driver setHoursOfWorkDependsOnStatusChanging(Driver driver, DriverStatus newStatus) throws TruckingServiceException;
+
+    List<Driver> findAllFreeDrivers(List<Driver> allDrivers) throws TruckingServiceException;
+
+    void sendSuccessRegistrationEmail(String email, String login, String password) throws  TruckingServiceException;
 }

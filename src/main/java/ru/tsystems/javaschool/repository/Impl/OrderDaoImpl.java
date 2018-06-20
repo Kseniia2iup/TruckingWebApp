@@ -77,7 +77,7 @@ public class OrderDaoImpl extends AbstractDao<Integer, Order> implements OrderDa
     public List<Order> findAllOrders() throws TruckingDaoException {
         try {
             Query query = getSession().createQuery("Select O from Order O" +
-                    " Left Join Fetch O.truck T Left Join Fetch T.city Order by O.id");
+                    " Left Join Fetch O.truck T Left Join Fetch T.city Order by O.id Desc");
             return query.list();
         } catch (Exception e){
             LOGGER.warn("From OrderDaoImpl method findAllOrders something went wrong:\n", e);
@@ -95,6 +95,21 @@ public class OrderDaoImpl extends AbstractDao<Integer, Order> implements OrderDa
             return query.uniqueResult() != null;
         } catch (Exception e){
             LOGGER.warn("From OrderDaoImpl method isTruckHasOrder something went wrong:\n", e);
+            throw new TruckingDaoException(e);
+        }
+    }
+
+    @Override
+    @SuppressWarnings("unchecked")
+    @Transactional(rollbackFor = TruckingDaoException.class,
+            readOnly = true, propagation = Propagation.SUPPORTS)
+    public List<Order> findLastTenOrders() throws TruckingDaoException {
+        try {
+            Query query = getSession().createQuery("Select O from Order O" +
+                    " Left Join Fetch O.truck T Left Join Fetch T.city Order by O.id Desc");
+            return query.setMaxResults(10).list();
+        } catch (Exception e){
+            LOGGER.warn("From OrderDaoImpl method findAllOrders something went wrong:\n", e);
             throw new TruckingDaoException(e);
         }
     }
