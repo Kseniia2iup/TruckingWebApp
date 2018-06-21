@@ -63,9 +63,19 @@ public class InfoBoardServiceImpl implements InfoBoardService {
     }
 
     @Override
-    @SuppressWarnings("unchecked")
     public void sendInfoToQueue() throws TruckingServiceException {
+        try {
+            LOGGER.info("Information about changes has successfully sent to the infoBoardQueue");
+            template.convertAndSend("infoBoardQueue", "update");
+        } catch (Exception e) {
+            LOGGER.warn("Something went wrong\n", e);
+            throw new TruckingServiceException(e);
+        }
+    }
 
+    @Override
+    @SuppressWarnings("unchecked")
+    public InfoDto getJSONInfoForUpdate() throws TruckingServiceException {
         try {
             InfoDto boardInfo = new InfoDto();
 
@@ -102,11 +112,11 @@ public class InfoBoardServiceImpl implements InfoBoardService {
 
             boardInfo.setLastTenOrders(prepareOrdersInfo());
 
+            //String result = convertDataToJSON(boardInfo).toJSONString();
 
-            String result = convertDataToJSON(boardInfo).toJSONString();
-            template.convertAndSend("infoBoardQueue", result);
+            LOGGER.info("JSON Data has successfully sent");
+            return boardInfo;
 
-            LOGGER.info("JSON Data has successfully sent to the infoBoardQueue");
         } catch (TruckingServiceException e) {
             LOGGER.warn("Something went wrong\n", e);
             throw new TruckingServiceException(e);

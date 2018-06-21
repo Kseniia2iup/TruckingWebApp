@@ -3,13 +3,14 @@ package ru.tsystems.javaschool.controller;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.RestController;
+import ru.tsystems.javaschool.dto.InfoDto;
 import ru.tsystems.javaschool.exceptions.TruckingServiceException;
 import ru.tsystems.javaschool.service.InfoBoardService;
 
-@Controller
+@RestController
 public class InfoBoardController {
     private static final Logger LOGGER = LoggerFactory.getLogger(InfoBoardController.class);
 
@@ -20,11 +21,11 @@ public class InfoBoardController {
         this.infoBoardService = infoBoardService;
     }
 
-    @RequestMapping("/emit")
-    @ResponseBody
-    String infoBoardQueue() throws TruckingServiceException {
+    @GetMapping(value = "/emit")
+    public @ResponseBody
+    InfoDto infoBoardQueue() throws TruckingServiceException {
         LOGGER.info("Emit to infoBoardQueue");
         infoBoardService.sendInfoToQueue();
-        return "Emit to queue";
+        return infoBoardService.getJSONInfoForUpdate();
     }
 }
