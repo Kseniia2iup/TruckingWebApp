@@ -39,7 +39,9 @@ public class CargoDaoImpl extends AbstractDao<Integer, Cargo> implements CargoDa
     @Transactional(rollbackFor = TruckingDaoException.class, propagation = Propagation.MANDATORY)
     public void deleteCargo(Integer id)  throws TruckingDaoException{
         try {
-            delete(findCargoById(id));
+            Query query = getSession().createQuery("Delete Cargo C WHERE C.id = :id");
+            query.setParameter("id", id);
+            query.executeUpdate();
         }
         catch (Exception e){
             LOGGER.warn("From CargoDaoImpl method deleteCargo something went wrong:\n", e);

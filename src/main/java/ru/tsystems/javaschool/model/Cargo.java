@@ -27,11 +27,11 @@ public class Cargo {
     @Enumerated(EnumType.STRING)
     private CargoStatus delivery_status;
 
-    @ManyToOne(cascade = {CascadeType.REMOVE, CascadeType.REMOVE}, fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "order_id")
     private Order order;
 
-    @OneToOne(cascade = {CascadeType.REMOVE, CascadeType.REMOVE}, mappedBy = "cargo")
+    @OneToOne(mappedBy = "cargo")
     private Waypoint waypoint;
 
     public Cargo() {

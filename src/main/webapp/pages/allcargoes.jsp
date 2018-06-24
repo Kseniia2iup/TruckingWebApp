@@ -39,13 +39,21 @@
             </header>
             <table class="table table-hover">
             <tr>
-                <td>NAME</td><td>WEIGHT</td><td>STATUS</td>
+                <td>NAME</td><td>WEIGHT</td><td>STATUS</td><td></td>
             </tr>
             <c:forEach items="${cargoes}" var="cargo">
                 <tr>
                     <td>${cargo.name}</td>
                     <td>${cargo.weight}</td>
                     <td>${cargo.delivery_status}</td>
+                    <td>${cargo.delivery_status}</td>
+                    <c:choose>
+                    <c:when test="${order.orderStatus=='CREATED' && order.truck==null}">
+                    <td><a href="<c:url value='/manager/delete-${cargo.id}-cargo' />" class="btn btn-danger custom-width">
+                        delete</a></td>
+                    </c:when>
+                    <c:otherwise><td/></c:otherwise>
+                    </c:choose>
                 </tr>
             </c:forEach>
         </table>

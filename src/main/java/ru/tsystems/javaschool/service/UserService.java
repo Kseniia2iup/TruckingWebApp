@@ -22,4 +22,8 @@ public interface UserService {
     boolean isUserLoginUnique(String login) throws TruckingServiceException;
 
     List<User> findAllUsers() throws TruckingServiceException;
+
+    boolean isEmailValid(String email) throws TruckingServiceException;
+
+    boolean isEmailUnique(String email) throws TruckingServiceException;
 }

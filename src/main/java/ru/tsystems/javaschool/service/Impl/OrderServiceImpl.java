@@ -13,7 +13,9 @@ import ru.tsystems.javaschool.repository.*;
 import ru.tsystems.javaschool.service.*;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Service("orderService")
 @Transactional
@@ -34,6 +36,13 @@ public class OrderServiceImpl implements OrderService {
     private WaypointService waypointService;
 
     private InfoBoardService infoBoardService;
+
+    private CargoService cargoService;
+
+    @Autowired
+    public void setCargoService(CargoService cargoService) {
+        this.cargoService = cargoService;
+    }
 
     @Autowired
     public void setInfoBoardService(InfoBoardService infoBoardService) {
@@ -85,6 +94,14 @@ public class OrderServiceImpl implements OrderService {
     public void deleteOrder(Integer id) throws TruckingServiceException {
         try {
             removeTruckAndDriversFromOrder(findOrderById(id));
+            List<Cargo> cargoes = cargoService.findAllCargoesOfOrder(id);
+
+            if (!cargoes.isEmpty()) {
+                for (Cargo cargo: cargoes
+                     ) {
+                    deleteCargo(cargo.getId());
+                }
+            }
             orderDao.deleteOrder(id);
             infoBoardService.sendInfoToQueue();
         }
@@ -251,6 +268,27 @@ public class OrderServiceImpl implements OrderService {
         }
         catch (Exception e){
             LOGGER.warn("Something went wrong in the OrderServiceImpl\n", e);
+            throw new TruckingServiceException(e);
+        }
+    }
+
+    @Override
+    public void deleteCargo(Integer cargoId) throws TruckingServiceException {
+        try {
+            Cargo cargo = cargoService.findCargoById(cargoId);
+            Waypoint waypoint = waypointService.findWaypointById(cargo.getWaypoint().getId());
+            waypoint.setOrder(null);
+            waypoint.setCargo(null);
+            cargo.setWaypoint(null);
+            cargo.setOrder(null);
+            cargoService.updateCargo(cargo);
+            waypointService.updateWaypoint(waypoint);
+            cargoService.deleteCargo(cargoId);
+            waypointService.deleteWaypoint(waypoint.getId());
+            infoBoardService.sendInfoToQueue();
+        }
+        catch (Exception e){
+            LOGGER.warn("Something went wrong\n", e);
             throw new TruckingServiceException(e);
         }
     }

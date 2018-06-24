@@ -349,38 +349,42 @@ public class DriverServiceImpl implements DriverService {
         String to = email;
 
         // Sender's email ID needs to be mentioned
-        String from = "kseniia.iup@gmail.com";
+        String from = "testlogiweb@gmail.com";
 
         // Assuming you are sending email from localhost
         String host = "localhost";
 
-        // Get system properties
-        Properties properties = System.getProperties();
 
-        // Setup mail server
-        properties.setProperty("mail.smtp.host", host);
+        final String username = "testlogiweb@gmail.com";
+        final String password_ = "Qwerty1423";
 
-        // Get the default Session object.
-        Session session = Session.getDefaultInstance(properties);
+        Properties props = new Properties();
+        props.put("mail.smtp.auth", "true");
+        props.put("mail.smtp.starttls.enable", "true");
+        props.put("mail.smtp.host", "smtp.gmail.com");
+        props.put("mail.smtp.port", "587");
 
+        Session session = Session.getInstance(props,
+                new javax.mail.Authenticator() {
+                    protected PasswordAuthentication getPasswordAuthentication() {
+                        return new PasswordAuthentication(username, password_);
+                    }
+                });
         try {
             // Create a default MimeMessage object.
             MimeMessage message = new MimeMessage(session);
 
-            // Set From: header field of the header.
             message.setFrom(new InternetAddress(from));
+            message.setRecipients(Message.RecipientType.TO,
+                    InternetAddress.parse(to));
+            message.setSubject("Registration on the LogiWeb");
+            message.setText("Dear" + username + ", \n" +
+                            "You have been successfully registered on the LogiWeb application \n"+
+                    "Your login and password: \n"
+                    + login + " " + password +
+                    "\n Login page: http://127.0.0.1:8181/trucking/login" +
+                    "\n Hope to see you soon!", "utf-8");
 
-            // Set To: header field of the header.
-            message.addRecipient(Message.RecipientType.TO, new InternetAddress(to));
-
-            // Set Subject: header field
-            message.setSubject("Registration on LogiWeb");
-
-            // Send the actual HTML message, as big as you like
-            message.setContent("<h1>Your login and password: </h1> <br/> <b>"
-                    + login + " " + password + "</b>", "text/html");
-
-            // Send message
             Transport.send(message);
         } catch (Exception e) {
             LOGGER.warn("Something went wrong\n", e);

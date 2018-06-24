@@ -43,6 +43,7 @@
             <tr>
                 <!--<th>Email</th>-->
                 <th>LOGIN</th>
+                <th>E-MAIL</th>
                 <th>ROLE</th>
                 <th width="100"></th>
             </tr>
@@ -52,6 +53,7 @@
                 <tr>
                     <!--<td>$//{user.email}</td>-->
                     <td>${user.login}</td>
+                    <td>${user.email}</td>
                     <td>${user.role}</td>
                     <c:choose>
                         <c:when test="${user.driver!=null}"></c:when>

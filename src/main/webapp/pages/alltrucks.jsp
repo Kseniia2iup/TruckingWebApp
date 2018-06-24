@@ -38,6 +38,9 @@
                 </div>
             </header>
         <table class="table table-hover">
+            <a href="<c:url value='/manager/newTruck' />" class="btn btn-success custom-width">Add New Truck</a>
+            <br/>
+            <br/>
     <tr>
         <td>REG NUMBER</td><td>CONDITION</td><td>MAX NUMBER OF DRIVERS</td><td>CAPACITY (TON)</td><td>CITY</td><td></td><td></td>
     </tr>
@@ -60,8 +63,6 @@
         </tr>
     </c:forEach>
 </table>
-<br/>
-<a href="<c:url value='/manager/newTruck' />" class="btn btn-success custom-width">Add New Truck</a>
         </article>
     </div>
 

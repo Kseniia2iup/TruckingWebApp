@@ -39,7 +39,9 @@ public class WaypointDaoImpl extends AbstractDao<Integer, Waypoint> implements W
             propagation = Propagation.MANDATORY)
     public void deleteWaypoint(Integer id) throws TruckingDaoException {
         try {
-            delete(findWaypointById(id));
+            Query query = getSession().createQuery("Delete Waypoint W WHERE W.id = :id");
+            query.setParameter("id", id);
+            query.executeUpdate();
         } catch (Exception e){
             LOGGER.warn("From WaypointDaoImpl method deleteWaypoint something went wrong:\n", e);
             throw new TruckingDaoException(e);

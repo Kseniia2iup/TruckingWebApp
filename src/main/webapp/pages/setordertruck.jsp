@@ -62,8 +62,9 @@
                 </div>
             </div>
             </form:form>
-        </div>
+    </div></div>
     </article>
+</div>
 
                 <!-- Sidebar -->
                 <section id="sidebar">

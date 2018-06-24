@@ -39,6 +39,7 @@
                 </div>
             </header>
         <table class="table table-hover">
+            <p><a href="<c:url value='/manager/newOrder' />" class="btn btn-success custom-width">Add New Order</a></p>
             <tr>
                 <td>UNIQUE NUMBER</td><td>STATUS</td><td>TRUCK</td><td></td><td></td>
             </tr>
@@ -57,11 +58,16 @@
                                 See Info</a></td>
                         </c:otherwise>
                     </c:choose>
+                    <c:choose>
+                    <c:when test="${order.orderStatus=='CREATED'}">
+                        <td><a href="<c:url value='/manager/${order.id}/deleteOrder' />" class="btn btn-danger custom-width">
+                            Delete</a></td>
+                    </c:when>
+                    <c:otherwise/>
+                    </c:choose>
                 </tr>
             </c:forEach>
         </table>
-        <br/>
-        <p><a href="<c:url value='/manager/newOrder' />" class="btn btn-success custom-width">Add New Order</a></p>
         </article>
 </div>
 

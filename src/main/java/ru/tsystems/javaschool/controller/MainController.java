@@ -17,6 +17,7 @@ import ru.tsystems.javaschool.exceptions.TruckingServiceException;
 import ru.tsystems.javaschool.model.User;
 import ru.tsystems.javaschool.model.enums.Role;
 import ru.tsystems.javaschool.service.UserService;
+import ru.tsystems.javaschool.validator.UserValidator;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -36,7 +37,14 @@ public class MainController {
     private static final String USER_LIST_VIEW_PATH = "redirect:/admin/listUsers";
     private static final String ADD_USER_VIEW_PATH = "newuser";
 
+    private UserValidator userValidator;
+
     private UserService userService;
+
+    @Autowired
+    public void setUserValidator(UserValidator userValidator) {
+        this.userValidator = userValidator;
+    }
 
     @Autowired
     public void setUserService(UserService userService) {
@@ -104,11 +112,10 @@ public class MainController {
                                    BindingResult result, ModelMap model)
             throws TruckingServiceException {
 
+        userValidator.validate(user, result);
+
         if (result.hasErrors()) {
             LOGGER.debug("There are errors while new user registration");
-            return ADD_USER_VIEW_PATH;
-        }
-        if (!userService.isUserValid(user)){
             return ADD_USER_VIEW_PATH;
         }
         userService.save(user);
@@ -132,6 +139,8 @@ public class MainController {
     public String updateUser(@Valid User user, BindingResult result,
                              ModelMap model, @PathVariable String login)
             throws TruckingServiceException {
+
+        userValidator.validate(user, result);
 
         if (result.hasErrors()) {
             model.addAttribute("currentUser", getPrincipal());

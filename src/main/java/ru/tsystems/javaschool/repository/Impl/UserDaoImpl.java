@@ -60,6 +60,16 @@ public class UserDaoImpl extends AbstractDao<Integer, User> implements UserDao {
         return (User) query.uniqueResult();
     }
 
+
+    @Transactional(rollbackFor = TruckingDaoException.class,
+            readOnly = true, propagation = Propagation.SUPPORTS)
+    @Override
+    public User findByEmail(String email) {
+        Query query = getSession().createQuery("SELECT U FROM User U WHERE U.email = :email");
+        query.setParameter("email", email);
+        return (User) query.uniqueResult();
+    }
+
     @Override
     @SuppressWarnings("unchecked")
     @Transactional(rollbackFor = TruckingDaoException.class,

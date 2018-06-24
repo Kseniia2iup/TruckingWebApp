@@ -39,7 +39,9 @@ public class OrderDaoImpl extends AbstractDao<Integer, Order> implements OrderDa
             propagation = Propagation.MANDATORY)
     public void deleteOrder(Integer id) throws TruckingDaoException {
         try {
-            delete(findOrderById(id));
+            Query query = getSession().createQuery("Delete Order O WHERE O.id = :id");
+            query.setParameter("id", id);
+            query.executeUpdate();
         } catch (Exception e){
             LOGGER.warn("From OrderDaoImpl method deleteOrder something went wrong:\n", e);
             throw new TruckingDaoException(e);

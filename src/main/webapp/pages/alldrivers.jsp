@@ -39,13 +39,18 @@
                 </div>
             </header>
         <table class="table table-hover">
+            <a href="<c:url value='/manager/newDriver' />"
+               class="btn btn-success custom-width">Add New Driver</a>
+            <br/>
+            <br/>
             <tr>
-                <td>NAME</td><td>SURNAME</td><td>WORKED THIS MONTH</td><td>STATUS</td><td>CITY</td><td></td><td></td>
+                <td>NAME</td><td>SURNAME</td><td>E-MAIL</td><td>WORKED THIS MONTH</td><td>STATUS</td><td>CITY</td><td></td><td></td>
             </tr>
             <c:forEach items="${drivers}" var="driver">
                 <tr>
                     <td>${driver.name}</td>
                     <td>${driver.surname}</td>
+                    <td>${driver.email}</td>
                     <td>${driver.workedThisMonth}</td>
                     <td>${driver.status}</td>
                     <td>${driver.city.name}</td>
@@ -61,8 +66,6 @@
                 </tr>
             </c:forEach>
         </table>
-        <br/>
-        <a href="<c:url value='/manager/newDriver' />" class="btn btn-success custom-width">Add New Driver</a>
         </article>
     </div>
 

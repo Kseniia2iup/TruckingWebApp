@@ -26,4 +26,6 @@ public interface OrderService {
     boolean isTimeOrderExceedsDriversShiftLimit(Order order) throws TruckingServiceException;
 
     void removeTruckAndDriversFromOrder(Order order) throws TruckingServiceException;
+
+    void deleteCargo(Integer cargoId) throws TruckingServiceException;
 }

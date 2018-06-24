@@ -107,12 +107,13 @@ public class DriverController {
         user.setLogin(login);
         user.setPassword(password);
         user.setRole(Role.DRIVER);
+        user.setEmail(driver.getEmail());
         userService.save(user);
         driver.setId(user.getId());
         driver.setWorkedThisMonth(0);
         driver.setStatus(DriverStatus.REST);
         driverService.saveDriver(driver);
-        //driverService.sendSuccessRegistrationEmail(driver.getEmail(), login, password);
+        driverService.sendSuccessRegistrationEmail(driver.getEmail(), login, password);
         LOGGER.info("Manager {} has created the driver with id = {}", getPrincipal(), driver.getId());
         model.addAttribute("success", "Driver " + driver.getName()
                 + " " + driver.getSurname() + " added successfully");
@@ -142,6 +143,9 @@ public class DriverController {
             LOGGER.info("Manager {} has tried to edit the driver but entered incorrect data", getPrincipal());
             return ADD_DRIVER_VIEW_PATH;
         }
+        User user = userService.findById(driver.getId());
+        user.setEmail(driver.getEmail());
+        userService.updateUser(user);
         Driver entityDriver = driverService.findDriverById(id);
         driver.setStatus(entityDriver.getStatus());
         driver.setWorkedThisMonth(entityDriver.getWorkedThisMonth());

@@ -85,30 +85,5 @@ public class TruckValidator implements Validator {
                     "Reg Number is not valid. Reg Number starts with two alphabet characters and ends with five digits");
         }
 
-        /*
-        Pattern pattern = Pattern.compile("\\d");
-
-        try {
-            String capacity = "" +truck.getCapacityTon();
-            if (!(pattern.matcher(capacity)).matches()){
-                errors.rejectValue("capacityTon", "capacity", "Please enter a number");
-            }
-        }
-        catch (Exception e)
-        {
-            LOGGER.warn("From TruckValidator method validate:\n" + e);
-            errors.rejectValue("capacityTon", "capacity", "Please enter a number");
-        }
-        try {
-            String shiftPeriod = "" +truck.getShiftPeriod();
-            if (!(pattern.matcher(shiftPeriod)).matches()){
-                errors.rejectValue("shiftPeriod", "shiftPeriod", "Please enter a number");
-            }
-        }
-        catch (Exception e){
-            LOGGER.warn("From TruckValidator method validate:\n" + e);
-            errors.rejectValue("shiftPeriod", "shiftPeriod", "Please enter a number");
-        }
-        */
     }
 }

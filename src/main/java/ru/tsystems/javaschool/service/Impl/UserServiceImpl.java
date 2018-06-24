@@ -12,6 +12,8 @@ import ru.tsystems.javaschool.repository.UserDao;
 import ru.tsystems.javaschool.service.UserService;
 
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 @Service("userService")
 @Transactional
@@ -51,7 +53,7 @@ public class UserServiceImpl implements UserService {
             if (entity != null) {
                 entity.setLogin(user.getLogin());
                 entity.setPassword(user.getPassword());
-                //entity.setEmail(user.getEmail());
+                entity.setEmail(user.getEmail());
                 entity.setRole(user.getRole());
             }
         }
@@ -111,6 +113,28 @@ public class UserServiceImpl implements UserService {
             return dao.findAllUsers();
         }
         catch (Exception e){
+            LOGGER.warn("Something went wrong\n", e);
+            throw new TruckingServiceException(e);
+        }
+    }
+
+    @Override
+    public boolean isEmailValid(String email) throws TruckingServiceException {
+        try {
+            Pattern pattern = Pattern.compile("[\\w[\\.[\\_[\\-]]]]+@+[\\w[\\.[\\_[\\-]]]]+.+\\w");
+            Matcher matcher = pattern.matcher(email);
+            return matcher.matches();
+        } catch (Exception e) {
+            LOGGER.warn("Something went wrong\n", e);
+            throw new TruckingServiceException(e);
+        }
+    }
+
+    @Override
+    public boolean isEmailUnique(String email) throws TruckingServiceException {
+        try {
+            return dao.findByEmail(email)==null;
+        } catch (Exception e) {
             LOGGER.warn("Something went wrong\n", e);
             throw new TruckingServiceException(e);
         }

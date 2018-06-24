@@ -6,11 +6,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.tsystems.javaschool.exceptions.CargoAlreadyDeliveredException;
+import ru.tsystems.javaschool.exceptions.TruckingDaoException;
 import ru.tsystems.javaschool.exceptions.TruckingServiceException;
-import ru.tsystems.javaschool.model.Cargo;
-import ru.tsystems.javaschool.model.City;
-import ru.tsystems.javaschool.model.Order;
-import ru.tsystems.javaschool.model.Truck;
+import ru.tsystems.javaschool.model.*;
 import ru.tsystems.javaschool.model.enums.CargoStatus;
 import ru.tsystems.javaschool.model.enums.OrderStatus;
 import ru.tsystems.javaschool.repository.CargoDao;
@@ -33,6 +31,13 @@ public class CargoServiceImpl implements CargoService {
     private CityService cityService;
 
     private InfoBoardService infoBoardService;
+
+    private WaypointService waypointService;
+
+    @Autowired
+    public void setWaypointService(WaypointService waypointService) {
+        this.waypointService = waypointService;
+    }
 
     @Autowired
     public void setInfoBoardService(InfoBoardService infoBoardService) {
@@ -74,9 +79,7 @@ public class CargoServiceImpl implements CargoService {
     public void deleteCargo(Integer id) throws TruckingServiceException {
         try {
             cargoDao.deleteCargo(id);
-            infoBoardService.sendInfoToQueue();
-        }
-        catch (Exception e){
+        } catch (Exception e){
             LOGGER.warn("Something went wrong\n", e);
             throw new TruckingServiceException(e);
         }

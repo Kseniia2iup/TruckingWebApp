@@ -82,28 +82,29 @@
                         <div class="form-actions floatRight">
 
                             </c:otherwise>
-                    </c:choose>
-                    <c:choose>
-                        <c:when test="${orderDrivers.size()!=0}">
-                    <br/>
-                    <br/>
-                    <a href="<c:url value="/manager/${order.id}/complete"/> " class="btn btn-success custom-width">
-                        Complete</a>
-                        </c:when>
-                        <c:otherwise/>
-                    </c:choose>
-                    <br/>
-                    <br/>
-                    <a href="<c:url value='/manager/${order.id}/setOrderTruck' />" class="btn btn-success custom-width">
-                        Change Truck</a>
-                    <br/>
-                    <br/>
-                    <a href="<c:url value="/manager/listOrders"/> " class="btn btn-success custom-width">
-                        All Orders</a>
+                        </c:choose>
+                        <c:choose>
+                            <c:when test="${orderDrivers.size()!=0}">
+                        <br/>
+                        <br/>
+                        <a href="<c:url value="/manager/${order.id}/complete"/> " class="btn btn-success custom-width">
+                            Complete</a>
+                            </c:when>
+                            <c:otherwise/>
+                        </c:choose>
+                        <br/>
+                        <br/>
+                        <a href="<c:url value='/manager/${order.id}/setOrderTruck' />" class="btn btn-success custom-width">
+                            Change Truck</a>
+                        <br/>
+                        <br/>
+                        <a href="<c:url value="/manager/listOrders"/> " class="btn btn-success custom-width">
+                            All Orders</a>
+                    </div>
+                </div>
                 </div>
             </div>
-        </form:form>
-    </div></div>
+            </form:form>
     </article>
     </div>
 

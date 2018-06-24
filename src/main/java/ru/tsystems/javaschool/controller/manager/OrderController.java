@@ -3,7 +3,6 @@ package ru.tsystems.javaschool.controller.manager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.MessageSource;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
@@ -163,10 +162,19 @@ public class OrderController {
         return "redirect:/manager/"+orderId+"/listOrderCargoes";
     }
 
-    @GetMapping(path = "manager/{id}/deleteCargo")
+    @GetMapping(path = "manager/delete-{id}-cargo")
     public String deleteCargo(@PathVariable Integer id, Model model)
             throws TruckingServiceException {
-        return "";
+        Order order = orderService.findOrderById(cargoService.findCargoById(id).getOrder().getId());
+        if (order.getTruck()!=null ||
+                (order.getOrderStatus() != OrderStatus.CREATED)) {
+            return ORDER_LIST_VIEW_PATH;
+        }
+        orderService.deleteCargo(id);
+        List<Cargo> cargoes = cargoService.findAllCargoesOfOrder(order.getId());
+        model.addAttribute("order", order);
+        model.addAttribute("cargoes", cargoes);
+        return ADD_ORDER_VIEW_PATH;
     }
 
     @GetMapping(path = "manager/{id}/setOrderTruck")
@@ -243,6 +251,12 @@ public class OrderController {
         order.setOrderStatus(OrderStatus.IN_PROCESS);
         orderService.updateOrder(order);
         LOGGER.info("Manager {} has completed order with id = {}", getPrincipal(), order.getId());
+        return ORDER_LIST_VIEW_PATH;
+    }
+
+    @GetMapping(path = "manager/{id}/deleteOrder")
+    public String deleteOrder(@PathVariable Integer id, Model model) throws TruckingServiceException{
+        orderService.deleteOrder(id);
         return ORDER_LIST_VIEW_PATH;
     }
 

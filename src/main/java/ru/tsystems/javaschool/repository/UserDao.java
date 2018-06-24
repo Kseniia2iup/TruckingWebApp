@@ -15,5 +15,7 @@ public interface UserDao {
 
     User findByLogin(String login);
 
+    User findByEmail(String email);
+
     List<User> findAllUsers() throws TruckingDaoException;
 }
