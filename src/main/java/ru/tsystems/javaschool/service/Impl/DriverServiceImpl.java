@@ -319,6 +319,12 @@ public class DriverServiceImpl implements DriverService {
     }
     }
 
+    /**
+     * Returns all free from work drivers
+     * @param allDrivers List of all drivers
+     * @return List of free drivers
+     * @throws TruckingServiceException if something went wrong
+     */
     @Override
     public List<Driver> findAllFreeDrivers(List<Driver> allDrivers) throws TruckingServiceException {
         try {

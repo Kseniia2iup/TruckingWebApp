@@ -112,8 +112,6 @@ public class InfoBoardServiceImpl implements InfoBoardService {
 
             boardInfo.setLastTenOrders(prepareOrdersInfo());
 
-            //String result = convertDataToJSON(boardInfo).toJSONString();
-
             LOGGER.info("JSON Data has successfully sent");
             return boardInfo;
 
@@ -175,25 +173,6 @@ public class InfoBoardServiceImpl implements InfoBoardService {
         }
     }
 
-    @SuppressWarnings("unchecked")
-    private JSONObject convertDataToJSON(InfoDto boardInfo){
-
-        JSONObject orderInfo = new JSONObject();
-
-        orderInfo.put("allDrivers", boardInfo.getAllDrivers());
-        orderInfo.put("driversOnOrder", boardInfo.getDriversOnOrder());
-        orderInfo.put("freeDrivers", boardInfo.getFreeDrivers());
-        orderInfo.put("allTrucks", boardInfo.getAllTrucks());
-        orderInfo.put("trucksOnOrder", boardInfo.getTrucksOnOrder());
-        orderInfo.put("availableTrucks", boardInfo.getAvailableTrucks());
-        orderInfo.put("brokenTrucks", boardInfo.getBrokenTrucks());
-
-        JSONArray jsonArray = new JSONArray();
-        jsonArray.addAll(boardInfo.getLastTenOrders());
-        orderInfo.put("lastTen", jsonArray);
-
-        return orderInfo;
-    }
 
     /**
      * Transforms List of Drivers to the String of their names and surnames

@@ -89,20 +89,4 @@ public class WaypointDaoImpl extends AbstractDao<Integer, Waypoint> implements W
         }
     }
 
-    @Override
-    @SuppressWarnings("unchecked")
-    @Transactional(rollbackFor = TruckingDaoException.class,
-            readOnly = true, propagation = Propagation.SUPPORTS)
-    public List<Waypoint> findAllWaypointsByCargoId(Integer cargoId) throws TruckingDaoException {
-        try {
-            Query query = getSession().createQuery("Select W from Waypoint W " +
-                    "Join Fetch W.order Join Fetch W.cityDep Join Fetch W.cityDest Join Fetch W.cargo " +
-                    "WHERE W.cargo_id = :id");
-            query.setParameter("id", cargoId);
-            return query.list();
-        } catch (Exception e){
-            LOGGER.warn("From WaypointDaoImpl method findAllWaypointsByCargoId something went wrong:\n", e);
-            throw new TruckingDaoException(e);
-        }
-    }
 }

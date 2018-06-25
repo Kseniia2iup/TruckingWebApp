@@ -16,6 +16,4 @@ public interface WaypointService {
     void updateWaypoint(Waypoint waypoint) throws TruckingServiceException;
 
     List<Waypoint> findAllWaypointsByOrderId(Integer orderId) throws TruckingServiceException;
-
-    List<Waypoint> findAllWaypointsByCargoId(Integer cargoId) throws TruckingServiceException;
 }

@@ -11,7 +11,7 @@
     <meta charset="utf-8" />
 
     <!--[if lte IE 8]><script src="/static/js/ie/html5shiv.js"></script><![endif]-->
-    <link href="<c:url value="/static/css/main.css"  />" rel="stylesheet" />
+    <link href="<c:url value="/static/css/custom.css"  />" rel="stylesheet" />
 </head>
 <body>
 <div id="wrapper">

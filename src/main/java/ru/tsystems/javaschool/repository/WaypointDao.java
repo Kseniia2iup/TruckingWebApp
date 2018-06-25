@@ -16,6 +16,4 @@ public interface WaypointDao {
     void updateWaypoint(Waypoint waypoint) throws TruckingDaoException;
 
     List<Waypoint> findAllWaypointsByOrderId(Integer orderId) throws TruckingDaoException;
-
-    List<Waypoint> findAllWaypointsByCargoId(Integer cargoId) throws TruckingDaoException;
 }

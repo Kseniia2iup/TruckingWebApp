@@ -85,15 +85,4 @@ public class WaypointServiceImpl implements WaypointService {
             throw new TruckingServiceException(e);
         }
     }
-
-    @Override
-    public List<Waypoint> findAllWaypointsByCargoId(Integer cargoId) throws TruckingServiceException {
-        try {
-            return waypointDao.findAllWaypointsByCargoId(cargoId);
-        }
-        catch (Exception e){
-            LOGGER.warn("Something went wrong\n", e);
-            throw new TruckingServiceException(e);
-        }
-    }
 }

@@ -1,11 +1,17 @@
 package ru.tsystems.javaschool.service.Impl;
 
+import org.junit.Before;
 import org.junit.Test;
 import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
+import ru.tsystems.javaschool.exceptions.TruckingDaoException;
 import ru.tsystems.javaschool.exceptions.TruckingServiceException;
 import ru.tsystems.javaschool.model.Driver;
 import ru.tsystems.javaschool.model.Truck;
 import ru.tsystems.javaschool.model.enums.DriverStatus;
+import ru.tsystems.javaschool.model.enums.TruckStatus;
+import ru.tsystems.javaschool.repository.DriverDao;
 import ru.tsystems.javaschool.service.DriverService;
 
 import java.util.ArrayList;
@@ -15,11 +21,41 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import static org.junit.Assert.assertTrue;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 public class DriverServiceImplTest {
 
+    @Mock
+    private DriverDao driverDao;
+
     @InjectMocks
     private DriverService driverService = new DriverServiceImpl();
+
+    @Before
+    public void init(){
+        MockitoAnnotations.initMocks(this);
+    }
+
+    @Test
+    public void findAllDriversTest() throws TruckingDaoException, TruckingServiceException {
+        when(driverDao.findAllDrivers()).thenReturn(new ArrayList<Driver>());
+        driverService.findAllDrivers();
+        verify(driverDao).findAllDrivers();
+    }
+
+    @Test
+    public void getAllDriversOfTruckTest() throws TruckingDaoException, TruckingServiceException{
+        Truck truck = new Truck();
+        truck.setId(1);
+        truck.setRegNumber("DD30349");
+        truck.setCapacityTon(2);
+        truck.setShiftPeriod(1);
+        truck.setCondition(TruckStatus.OK);
+        when(driverDao.getAllDriversOfTruck(truck)).thenReturn(new ArrayList<Driver>());
+        driverService.getAllDriversOfTruck(truck);
+        verify(driverDao).getAllDriversOfTruck(truck);
+    }
 
     @Test
     public void generateDriverPasswordTest(){
