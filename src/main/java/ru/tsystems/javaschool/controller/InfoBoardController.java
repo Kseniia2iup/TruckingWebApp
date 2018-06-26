@@ -25,7 +25,6 @@ public class InfoBoardController {
     public @ResponseBody
     InfoDto infoBoardQueue() throws TruckingServiceException {
         LOGGER.info("Emit to infoBoardQueue");
-        //infoBoardService.sendInfoToQueue();
         return infoBoardService.getJSONInfoForUpdate();
     }
 }

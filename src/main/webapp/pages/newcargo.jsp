@@ -98,21 +98,6 @@
         </article>
     </div>
 
-    <!-- Sidebar -->
-    <section id="sidebar">
-
-        <!-- Intro -->
-        <section id="intro">
-            <a href="<c:url value="/manager/listOrders"/>" class="logo">
-                <img src="<c:url value="/static/images/logo.jpg"/>" alt="" /></a>
-            <header>
-                <h2>LogiWeb</h2>
-                <p>Would you like to create <a href="<c:url value='/manager/newOrder' />">A NEW ORDER</a>
-                    <br/> Or see <a href="<c:url value="/manager/listOrders"/> ">
-                        All Orders</a>?</p>
-            </header>
-        </section>
-    </section>
 </div>
 </body>
 </html>

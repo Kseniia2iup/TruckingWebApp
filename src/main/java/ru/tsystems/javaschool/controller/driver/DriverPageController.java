@@ -133,7 +133,7 @@ public class DriverPageController {
         String result =
                 cargoService.setCargoStatus(cargoService.findCargoById(id), CargoStatus.DELIVERED);
         if(result.equals("done")){
-            LOGGER.info("Driver {} has completed the order {}", getPrincipal(), cargo.getOrder().getId());
+//            LOGGER.info("Driver {} has completed the order {}", getPrincipal(), cargo.getOrder().getId());
             return "redirect:/driver/orderisdone";
         }
         LOGGER.info("Driver {} has delivered cargo {}", getPrincipal(), cargo.getId());

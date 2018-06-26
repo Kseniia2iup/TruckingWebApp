@@ -3,6 +3,9 @@ package ru.tsystems.javaschool.service.Impl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.PropertySource;
+import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.tsystems.javaschool.exceptions.TruckingServiceException;
@@ -29,6 +32,7 @@ import javax.activation.*;
 
 @Service("driverService")
 @Transactional
+@PropertySource(value = {"classpath:email.properties" })
 public class DriverServiceImpl implements DriverService {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(DriverServiceImpl.class);
@@ -40,6 +44,9 @@ public class DriverServiceImpl implements DriverService {
     private OrderService orderService;
 
     private InfoBoardService infoBoardService;
+
+    @Autowired
+    private Environment environment;
 
     @Autowired
     public void setInfoBoardService(InfoBoardService infoBoardService) {
@@ -355,14 +362,15 @@ public class DriverServiceImpl implements DriverService {
         String to = email;
 
         // Sender's email ID needs to be mentioned
-        String from = "testlogiweb@gmail.com";
+        String from = environment.getProperty("email.email");
 
         // Assuming you are sending email from localhost
         String host = "localhost";
 
 
-        final String username = "testlogiweb@gmail.com";
-        final String password_ = "Qwerty1423";
+        final String username = environment.getProperty("email.email");
+
+        final String password_ = environment.getProperty("email.password");
 
         Properties props = new Properties();
         props.put("mail.smtp.auth", "true");
