@@ -35,18 +35,11 @@ public class OrderServiceImpl implements OrderService {
 
     private WaypointService waypointService;
 
-    private InfoBoardService infoBoardService;
-
     private CargoService cargoService;
 
     @Autowired
     public void setCargoService(CargoService cargoService) {
         this.cargoService = cargoService;
-    }
-
-    @Autowired
-    public void setInfoBoardService(InfoBoardService infoBoardService) {
-        this.infoBoardService = infoBoardService;
     }
 
     @Autowired
@@ -103,7 +96,6 @@ public class OrderServiceImpl implements OrderService {
                 }
             }
             orderDao.deleteOrder(id);
-            infoBoardService.sendInfoToQueue();
         }
         catch (Exception e){
             LOGGER.warn("Something went wrong in the OrderServiceImpl\n", e);
@@ -115,7 +107,6 @@ public class OrderServiceImpl implements OrderService {
     public void saveOrder(Order order) throws TruckingServiceException {
         try {
             orderDao.saveOrder(order);
-            infoBoardService.sendInfoToQueue();
         }
         catch (Exception e){
             LOGGER.warn("Something went wrong in the OrderServiceImpl\n", e);
@@ -127,7 +118,6 @@ public class OrderServiceImpl implements OrderService {
     public void updateOrder(Order order) throws TruckingServiceException {
         try {
             orderDao.updateOrder(order);
-            infoBoardService.sendInfoToQueue();
         }
         catch (Exception e){
             LOGGER.warn("Something went wrong in the OrderServiceImpl\n", e);
@@ -263,7 +253,6 @@ public class OrderServiceImpl implements OrderService {
                 truckDao.updateTruck(truck);
                 entityOrder.setTruck(null);
                 orderDao.updateOrder(entityOrder);
-                infoBoardService.sendInfoToQueue();
             }
         }
         catch (Exception e){
@@ -285,7 +274,6 @@ public class OrderServiceImpl implements OrderService {
             waypointService.updateWaypoint(waypoint);
             cargoService.deleteCargo(cargoId);
             waypointService.deleteWaypoint(waypoint.getId());
-            infoBoardService.sendInfoToQueue();
         }
         catch (Exception e){
             LOGGER.warn("Something went wrong\n", e);

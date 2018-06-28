@@ -48,6 +48,13 @@ public class OrderController {
 
     private CargoValidator cargoValidator;
 
+    private InfoBoardService infoBoardService;
+
+    @Autowired
+    public void setInfoBoardService(InfoBoardService infoBoardService) {
+        this.infoBoardService = infoBoardService;
+    }
+
     @Autowired
     public void setCargoValidator(CargoValidator cargoValidator) {
         this.cargoValidator = cargoValidator;
@@ -96,6 +103,7 @@ public class OrderController {
         order.setOrderStatus(OrderStatus.CREATED);
         orderService.saveOrder(order);
         model.addAttribute("order", orderService.findOrderById(order.getId()));
+        infoBoardService.sendInfoToQueue();
         LOGGER.info("Manager {} has created order with id = {}", getPrincipal(), order.getId());
         return "redirect:/manager/"+order.getId()+"/listOrderCargoes";
     }
@@ -156,6 +164,7 @@ public class OrderController {
         waypoint.setCityDest(cargo.getWaypoint().getCityDest());
         waypointService.saveWaypoint(waypoint);
 
+        infoBoardService.sendInfoToQueue();
         model.addAttribute("order", orderService.findOrderById(orderId));
         LOGGER.info("Manager {} has added the cargo with id = {} to the order with id = {}",
                 getPrincipal(), cargo.getId(), order.getId());
@@ -171,6 +180,7 @@ public class OrderController {
             return ORDER_LIST_VIEW_PATH;
         }
         orderService.deleteCargo(id);
+        infoBoardService.sendInfoToQueue();
         List<Cargo> cargoes = cargoService.findAllCargoesOfOrder(order.getId());
         model.addAttribute("order", order);
         model.addAttribute("cargoes", cargoes);
@@ -187,6 +197,7 @@ public class OrderController {
             return ORDER_LIST_VIEW_PATH;
         }
         orderService.removeTruckAndDriversFromOrder(order);
+        infoBoardService.sendInfoToQueue();
         model.addAttribute("order", order);
         model.addAttribute("trucks",
                 truckService.findAllTrucksReadyForOrder(order));
@@ -202,6 +213,7 @@ public class OrderController {
                 truckService.findAllTrucksReadyForOrder(entityOrder));
         entityOrder.setTruck(order.getTruck());
         orderService.updateOrder(entityOrder);
+        infoBoardService.sendInfoToQueue();
         LOGGER.info("Manager {} has added the truck with id = {} to the order with id = {}",
                 getPrincipal(), order.getTruck().getId(), order.getId());
         return "redirect:/manager/"+id+"/setOrderDrivers";
@@ -233,6 +245,7 @@ public class OrderController {
         driver.setOrder(entityOrder);
         driver.setCurrentTruck(entityOrder.getTruck());
         driverService.updateDriver(driver);
+        infoBoardService.sendInfoToQueue();
         LOGGER.info("Manager {} has added the driver with id = {} to the order with id = {}",
                 getPrincipal(), newDriver.getId(), id);
         return "redirect:/manager/"+id+"/setOrderDrivers";
@@ -250,6 +263,7 @@ public class OrderController {
         }
         order.setOrderStatus(OrderStatus.IN_PROCESS);
         orderService.updateOrder(order);
+        infoBoardService.sendInfoToQueue();
         LOGGER.info("Manager {} has completed order with id = {}", getPrincipal(), order.getId());
         return ORDER_LIST_VIEW_PATH;
     }
@@ -257,10 +271,11 @@ public class OrderController {
     @GetMapping(path = "manager/{id}/deleteOrder")
     public String deleteOrder(@PathVariable Integer id, Model model) throws TruckingServiceException{
         orderService.deleteOrder(id);
+        infoBoardService.sendInfoToQueue();
         return ORDER_LIST_VIEW_PATH;
     }
 
-    //@ModelAttribute("user")
+    @ModelAttribute("user_")
     private String getPrincipal(){
         String userName = null;
         Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();

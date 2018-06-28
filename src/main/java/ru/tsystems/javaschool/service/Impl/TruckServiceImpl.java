@@ -39,13 +39,6 @@ public class TruckServiceImpl implements TruckService {
 
     private CargoDao cargoDao;
 
-    private InfoBoardService infoBoardService;
-
-    @Autowired
-    public void setInfoBoardService(InfoBoardService infoBoardService) {
-        this.infoBoardService = infoBoardService;
-    }
-
     @Autowired
     public void setCargoDao(CargoDao cargoDao) {
         this.cargoDao = cargoDao;
@@ -92,7 +85,6 @@ public class TruckServiceImpl implements TruckService {
     public void saveTruck(Truck truck) throws TruckingServiceException {
         try {
             truckDao.saveTruck(truck);
-            infoBoardService.sendInfoToQueue();
         }
         catch (Exception e){
             LOGGER.warn("Something went wrong\n", e);
@@ -104,7 +96,6 @@ public class TruckServiceImpl implements TruckService {
     public void deleteTruckByRegNumber(String regNumber) throws TruckingServiceException {
         try {
             truckDao.deleteTruckByRegNumber(regNumber);
-            infoBoardService.sendInfoToQueue();
         }
         catch (Exception e){
             LOGGER.warn("Something went wrong\n", e);
@@ -127,7 +118,6 @@ public class TruckServiceImpl implements TruckService {
     public void updateTruck(Truck truck) throws TruckingServiceException {
         try {
             truckDao.updateTruck(truck);
-            infoBoardService.sendInfoToQueue();
         }
         catch (Exception e){
             LOGGER.warn("Something went wrong\n", e);

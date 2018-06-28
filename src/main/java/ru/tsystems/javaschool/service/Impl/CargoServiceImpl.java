@@ -30,20 +30,6 @@ public class CargoServiceImpl implements CargoService {
 
     private CityService cityService;
 
-    private InfoBoardService infoBoardService;
-
-    private WaypointService waypointService;
-
-    @Autowired
-    public void setWaypointService(WaypointService waypointService) {
-        this.waypointService = waypointService;
-    }
-
-    @Autowired
-    public void setInfoBoardService(InfoBoardService infoBoardService) {
-        this.infoBoardService = infoBoardService;
-    }
-
     @Autowired
     public void setCityService(CityService cityService) {
         this.cityService = cityService;
@@ -89,7 +75,6 @@ public class CargoServiceImpl implements CargoService {
     public void saveCargo(Cargo cargo) throws TruckingServiceException {
         try {
             cargoDao.saveCargo(cargo);
-            infoBoardService.sendInfoToQueue();
         }
         catch (Exception e){
             LOGGER.warn("Something went wrong\n", e);
@@ -101,7 +86,6 @@ public class CargoServiceImpl implements CargoService {
     public void updateCargo(Cargo cargo) throws TruckingServiceException {
         try {
             cargoDao.updateCargo(cargo);
-            infoBoardService.sendInfoToQueue();
         }
         catch (Exception e){
             LOGGER.warn("Something went wrong\n", e);

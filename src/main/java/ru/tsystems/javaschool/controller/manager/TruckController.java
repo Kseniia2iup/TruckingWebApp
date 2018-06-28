@@ -16,6 +16,7 @@ import ru.tsystems.javaschool.model.City;
 import ru.tsystems.javaschool.model.Truck;
 import ru.tsystems.javaschool.model.enums.TruckStatus;
 import ru.tsystems.javaschool.service.CityService;
+import ru.tsystems.javaschool.service.InfoBoardService;
 import ru.tsystems.javaschool.service.TruckService;
 import ru.tsystems.javaschool.validator.TruckValidator;
 
@@ -39,6 +40,13 @@ public class TruckController {
     private CityService cityService;
 
     private TruckValidator truckValidator;
+
+    private InfoBoardService infoBoardService;
+
+    @Autowired
+    public void setInfoBoardService(InfoBoardService infoBoardService) {
+        this.infoBoardService = infoBoardService;
+    }
 
     @Autowired
     public void setTruckValidator(TruckValidator truckValidator) {
@@ -66,6 +74,7 @@ public class TruckController {
     @GetMapping(path = { "manager/delete-{reg_number}-truck" })
     public String deleteTruck(@PathVariable String reg_number) throws TruckingServiceException {
         truckService.deleteTruckByRegNumber(reg_number);
+        infoBoardService.sendInfoToQueue();
         LOGGER.info("Manager {} has deleted truck with regNumber = {}", getPrincipal(), reg_number);
         return TRUCK_LIST_VIEW_PATH;
     }
@@ -90,6 +99,7 @@ public class TruckController {
 
         truckService.saveTruck(truck);
 
+        infoBoardService.sendInfoToQueue();
         LOGGER.info("Manager {} has created the truck with id = {}", getPrincipal(), truck.getId());
         model.addAttribute("success", "Truck " + truck.getRegNumber() + " added successfully");
         return TRUCK_LIST_VIEW_PATH;
@@ -119,6 +129,7 @@ public class TruckController {
 
         truckService.updateTruck(truck);
 
+        infoBoardService.sendInfoToQueue();
         LOGGER.info("Manager {} has edited the truck with id = {}", getPrincipal(), truck.getId());
         model.addAttribute("success", "Truck " + truck.getRegNumber()  + " updated successfully");
         return TRUCK_LIST_VIEW_PATH;

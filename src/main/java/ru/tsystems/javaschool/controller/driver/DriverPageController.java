@@ -43,6 +43,13 @@ public class DriverPageController {
 
     private CityService cityService;
 
+    private InfoBoardService infoBoardService;
+
+    @Autowired
+    public void setInfoBoardService(InfoBoardService infoBoardService) {
+        this.infoBoardService = infoBoardService;
+    }
+
     @Autowired
     public void setCityService(CityService cityService) {
         this.cityService = cityService;
@@ -115,6 +122,7 @@ public class DriverPageController {
         }
         Driver entityDriver = driverService.findDriverById(id);
         driverService.setDriverStatus(entityDriver,driver.getStatus());
+        infoBoardService.sendInfoToQueue();
         LOGGER.info("Driver {} has set new status", getPrincipal());
         return "redirect:/driver";
     }
@@ -123,6 +131,7 @@ public class DriverPageController {
     public String loadCargo(@PathVariable Integer id, Cargo cargo, Model model)
             throws TruckingServiceException, CargoAlreadyDeliveredException {
         cargoService.setCargoStatus(cargoService.findCargoById(id), CargoStatus.SHIPPED);
+        infoBoardService.sendInfoToQueue();
         LOGGER.info("Driver {} has shipped cargo {}", getPrincipal(), cargo.getId());
         return "redirect:/driver";
     }
@@ -133,18 +142,19 @@ public class DriverPageController {
         String result =
                 cargoService.setCargoStatus(cargoService.findCargoById(id), CargoStatus.DELIVERED);
         if(result.equals("done")){
-//            LOGGER.info("Driver {} has completed the order {}", getPrincipal(), cargo.getOrder().getId());
             return "redirect:/driver/orderisdone";
         }
+        infoBoardService.sendInfoToQueue();
         LOGGER.info("Driver {} has delivered cargo {}", getPrincipal(), cargo.getId());
         return "redirect:/driver";
     }
 
     @GetMapping(path = "driver/orderisdone")
-    public String showOrderIsDonSuccessPage(Model model) {
+    public String showOrderIsDonSuccessPage(Model model) throws TruckingServiceException{
         model.addAttribute("message", "Order is successfully done!" +
                     "\n Thank you!");
         model.addAttribute("user", getPrincipal());
+        infoBoardService.sendInfoToQueue();
         return "orderisdone";
     }
 
@@ -155,6 +165,7 @@ public class DriverPageController {
         }
         Integer truckId = driverService.findDriverById(id).getCurrentTruck().getId();
         truckService.markTruckAsBrokenWhileOrder(truckId);
+        infoBoardService.sendInfoToQueue();
         LOGGER.info("{}'s truck {} has broken", getPrincipal(), truckId);
         return "redirect:/driver";
     }

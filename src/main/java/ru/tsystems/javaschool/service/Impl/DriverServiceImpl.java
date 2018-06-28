@@ -43,15 +43,8 @@ public class DriverServiceImpl implements DriverService {
 
     private OrderService orderService;
 
-    private InfoBoardService infoBoardService;
-
     @Autowired
     private Environment environment;
-
-    @Autowired
-    public void setInfoBoardService(InfoBoardService infoBoardService) {
-        this.infoBoardService = infoBoardService;
-    }
 
     @Autowired
     public void setOrderService(OrderService orderService) {
@@ -84,7 +77,6 @@ public class DriverServiceImpl implements DriverService {
     public void deleteDriver(Integer id) throws TruckingServiceException {
         try {
             driverDao.deleteDriver(id);
-            infoBoardService.sendInfoToQueue();
         }
         catch (Exception e){
             LOGGER.warn("Something went wrong\n", e);
@@ -96,7 +88,6 @@ public class DriverServiceImpl implements DriverService {
     public void saveDriver(Driver driver) throws TruckingServiceException {
         try {
             driverDao.saveDriver(driver);
-            infoBoardService.sendInfoToQueue();
         }
         catch (Exception e){
             LOGGER.warn("Something went wrong\n", e);
@@ -108,7 +99,6 @@ public class DriverServiceImpl implements DriverService {
     public void updateDriver(Driver driver) throws TruckingServiceException {
         try {
             driverDao.updateDriver(driver);
-            infoBoardService.sendInfoToQueue();
         }
         catch (Exception e){
             LOGGER.warn("Something went wrong\n", e);
@@ -277,7 +267,6 @@ public class DriverServiceImpl implements DriverService {
     public void setDriverStatus(Driver driver, DriverStatus newStatus) throws TruckingServiceException {
         try {
             updateDriver(setHoursOfWorkDependsOnStatusChanging(driver, newStatus));
-            infoBoardService.sendInfoToQueue();
         }
         catch (Exception e){
             LOGGER.warn("Something went wrong\n", e);

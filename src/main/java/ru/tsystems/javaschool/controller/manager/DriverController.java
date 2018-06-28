@@ -18,6 +18,7 @@ import ru.tsystems.javaschool.model.enums.DriverStatus;
 import ru.tsystems.javaschool.model.enums.Role;
 import ru.tsystems.javaschool.service.CityService;
 import ru.tsystems.javaschool.service.DriverService;
+import ru.tsystems.javaschool.service.InfoBoardService;
 import ru.tsystems.javaschool.service.UserService;
 import ru.tsystems.javaschool.validator.DriverValidator;
 
@@ -35,6 +36,13 @@ public class DriverController {
 
     private static final String DRIVER_LIST_VIEW_PATH = "redirect:/manager/listDrivers";
     private static final String ADD_DRIVER_VIEW_PATH = "newdriver";
+
+    private InfoBoardService infoBoardService;
+
+    @Autowired
+    public void setInfoBoardService(InfoBoardService infoBoardService) {
+        this.infoBoardService = infoBoardService;
+    }
 
     private DriverValidator driverValidator;
 
@@ -80,6 +88,7 @@ public class DriverController {
         }
         driverService.deleteDriver(id);
         userService.delete(id);
+        infoBoardService.sendInfoToQueue();
         LOGGER.info("Manager {} has deleted driver with id = {}", getPrincipal(), id);
         return DRIVER_LIST_VIEW_PATH;
     }
@@ -114,6 +123,7 @@ public class DriverController {
         driver.setStatus(DriverStatus.REST);
         driverService.saveDriver(driver);
         driverService.sendSuccessRegistrationEmail(driver.getEmail(), login, password);
+        infoBoardService.sendInfoToQueue();
         LOGGER.info("Manager {} has created the driver with id = {}", getPrincipal(), driver.getId());
         model.addAttribute("success", "Driver " + driver.getName()
                 + " " + driver.getSurname() + " added successfully");
@@ -151,6 +161,7 @@ public class DriverController {
         driver.setWorkedThisMonth(entityDriver.getWorkedThisMonth());
         driverService.updateDriver(driver);
 
+        infoBoardService.sendInfoToQueue();
         LOGGER.info("Manager {} has edited the driver with id = {}", getPrincipal(), driver.getId());
         return DRIVER_LIST_VIEW_PATH;
     }
